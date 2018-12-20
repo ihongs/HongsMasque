@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+    <head>
+        <title>HongsCORE::站点管理</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <base href="../../">
+        <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+        <link rel="stylesheet" type="text/css" href="static/assets/css/bootstrap.min.css"/>
+        <link rel="stylesheet" type="text/css" href="static/assets/css/hongscore.min.css"/>
+        <link rel="stylesheet" type="text/css" href="centra/head.css"/>
+        <link rel="stylesheet" type="text/css" href="centra/master/util.css"/>
+        <!--[if glt IE8.0]>
+        <script type="text/javascript" src="static/addons/respond/respond.min.js"></script>
+        <![endif]-->
+        <script type="text/javascript" src="static/assets/jquery.min.js"></script>
+        <script type="text/javascript" src="static/assets/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="static/assets/bootstrap.min.js"></script>
+        <script type="text/javascript" src="static/assets/hongscore.min.js"></script>
+        <script type="text/javascript" src="common/conf/default.js"></script>
+        <script type="text/javascript" src="common/lang/default.js"></script>
+        <script type="text/javascript" src="common/auth/centra.js"></script>
+    </head>
+    <body>
+        <div id="notebox"></div>
+        <div id="context">
+            <div id="headbox">
+                <div id="menu-context" data-load="centra/head.jsp"></div>
+            </div>
+            <div id="bodybox">
+                <div id="main-context" class="container-fluid">
+                    <ol class="breadcrumb tabs laps hide row" data-toggle="hsTabs">
+                        <li class="back-crumb dont-close pull-right">
+                            <a href="javascript:;">
+                                <i class="glyphicon glyphicon-remove-sign"></i>
+                            </a>
+                        </li>
+                        <li class="home-crumb active">
+                            <a href="javascript:;">
+                                <i class="glyphicon glyphicon-folder-open"></i>
+                                <b></b>
+                            </a>
+                        </li>
+                    </ol>
+                    <div class="labs laps">
+                        <div></div>
+                        <div data-load="centra/masque/site/list.html"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

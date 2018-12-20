@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db xmlns="http://hongs-core"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://ihongs.github.io/hongs-core db.xsd">
+    <config link="centra"/>
+    <tables>
+        <table name="site"
+               tableName="a_masque_site"
+               primaryKey="id">
+        </table>
+        <table name="chat"
+               tableName="a_masque_chat"
+               primaryKey="id">
+        </table>
+        <table name="stat"
+               tableName="a_masque_stat"
+               primaryKey="id">
+        </table>
+        <table name="room"
+               tableName="a_masque_room"
+               primaryKey="id">
+        </table>
+        <table name="mate"
+               tableName="a_masque_mate"
+               primaryKey="id">
+        </table>
+    </tables>
+</db>

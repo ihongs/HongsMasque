@@ -1,0 +1,54 @@
+<h2>{DO}站点</h2>
+<div id="masque-site-form"
+     data-module="hsForm"
+     data-load-url="centra/masque/site/search.act"
+     data-save-url="centra/master/user/update.act"
+     data-data-0="_fill_head:(hsFormFillView)">
+    <form action="" method="POST" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-xs-6 center-block">
+                <div class="form-group">
+                    <label class="control-label">编号</label>
+                    <input type="text" name="id" class="form-control" required="required" readonly="readonly"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">秘钥</label>
+                    <input type="text" name="sk" class="form-control" required="required" readonly="readonly"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">名称</label>
+                    <input type="text" name="name" class="form-control" required="required"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label">备注</label>
+                    <input type="text" name="note" class="form-control"/>
+                </div>
+                <div class="form-group dont-close">
+                    <label class="control-label">头像</label>
+                    <input type="text" name="head" class="invisible form-ignored"/>
+                    <input type="file" name="head" class="invisible form-ignored" accept="image/*"/>
+                    <ul class="pickbox" data-fn="head" data-size="256*256"></ul>
+                    <button type="button" class="btn btn-default form-control" data-toggle="hsView">请选择头像</button>
+                    <p class="help-block">缩略图比例 1:1, 推荐分辨率 64*64 到 256*256 (像素)</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="ensure btn btn-primary">提交</button>
+            <button type="button" class="cancel btn btn-link"   >取消</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    (function($) {
+        var context = $("#master-user-form");
+
+        if (!H$("&id", context)) {
+            context.attr("data-save-url", context.attr("data-save-url")
+                   .replace("update.act", "create.act"));
+            // 创建模型下无需显示编号和秘钥
+            context.find("[name=id]").closest(".form-group").remove();
+            context.find("[name=sk]").closest(".form-group").remove();
+        }
+    })(jQuery);
+</script>
