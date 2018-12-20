@@ -10,25 +10,25 @@
 
 本项目代码依赖 HongsCORE,HongsCRAP 两个项目, 故需先获取并构建这两个系统. 完整流程如下:
 
-    ```bash
-    # 构建 HongsCORE
-    git clone https://github.com/ihongs/HongsCORE.git
-    cd HongsCORE
-    mvn package
-    cd ..
+```bash
+# 构建 HongsCORE
+git clone https://github.com/ihongs/HongsCORE.git
+cd HongsCORE
+mvn package
+cd ..
 
-    # 构建 HongsCRAP
-    git clone https://github.com/ihongs/HongsCRAP.git
-    cd HongsCRAP
-    mvn package
-    cd ..
+# 构建 HongsCRAP
+git clone https://github.com/ihongs/HongsCRAP.git
+cd HongsCRAP
+mvn package
+cd ..
 
-    # 构建、设置并启动
-    git clone https://github.com/ihongs/HongsMasque.git
-    cd HongsMasque
-    mvn package
-    # 初始设置
-    sh hongs-masque-web/target/HongsMasque/bin/hdo system.setup --DEBUG 0
-    # 启动服务
-    sh hongs-masque-web/target/HongsMasque/bin/hdo server.start --DEBUG 1
-    ```
+# 构建、设置并启动
+git clone https://github.com/ihongs/HongsMasque.git
+cd HongsMasque
+mvn package
+# 初始设置
+sh hongs-masque-web/target/HongsMasque/bin/hdo system.setup --DEBUG 0
+# 启动服务
+sh hongs-masque-web/target/HongsMasque/bin/hdo server.start --DEBUG 1
+```
