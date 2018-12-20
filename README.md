@@ -27,8 +27,13 @@ cd ..
 git clone https://github.com/ihongs/HongsMasque.git
 cd HongsMasque
 mvn package
+cd hongs-masque-web/target/HongsMasque
 # 初始设置
-sh hongs-masque-web/target/HongsMasque/bin/hdo system.setup --DEBUG 0
+sh bin/hdo system.setup --DEBUG 0
 # 启动服务
-sh hongs-masque-web/target/HongsMasque/bin/hdo server.start --DEBUG 1
+sh bin/hdo server.start --DEBUG 1
 ```
+
+可以将构建的 `hongs-masque-web/target/HongsMasque` 拷贝出来, 这是最终的应用目录. Windows 下在此目录, 双击 `setup.bat` 即可完成设置, 双击 `start.bat` 立即启动服务; 注意: Windows 下关闭服务程序务必在命令窗口按 Ctrl+C 中止进程, 不要直接关闭命令窗口, 后者导致下次启动不了可尝试删除 var/server/8080.pid 文件再重新启动.
+
+浏览器打开 `http://localhost:8080/` 进入后台.
