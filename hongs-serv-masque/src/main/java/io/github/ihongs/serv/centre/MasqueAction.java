@@ -37,6 +37,13 @@ public class MasqueAction {
         Map    req = helper.getRequestData( );
         Set    ab  = Synt.toTerms(req.get(Cnst.AB_KEY));
 
+        /**
+         * 默认逆序
+         */
+        if ( ! req.containsKey(Cnst.OB_KEY)) {
+            req.put (Cnst.OB_KEY, "-ctime");
+        }
+
         helper.reply(mod.search(req));
 
         /**
