@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS `a_masque_site`;
 CREATE TABLE `a_masque_site` (
   `id` CHAR(14) NOT NULL,
   `sk` CHAR(32) NOT NULL,
+  `user_id` CHAR(14) DEFAULT NULL, /* 关联的属主 */
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
   `icon` VARCHAR(100) DEFAULT NULL,
@@ -17,9 +18,10 @@ CREATE TABLE `a_masque_site` (
   `ctime` INTEGER UNSIGNED DEFAULT NULL,
   `mtime` INTEGER UNSIGNED DEFAULT NULL,
   `state` TINYINT DEFAULT '1',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 );
 
+CREATE INDEX `IK_a_masque_site_user` ON `a_masque_site` (`user_id`);
 CREATE INDEX `IK_a_masque_site_state` ON `a_masque_site` (`state`);
 
 --
