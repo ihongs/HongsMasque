@@ -1,5 +1,6 @@
 package io.github.ihongs.serv.centra;
 
+import io.github.ihongs.Core;
 import io.github.ihongs.HongsException;
 import io.github.ihongs.action.ActionHelper;
 import io.github.ihongs.action.anno.Action;
@@ -9,6 +10,7 @@ import io.github.ihongs.action.anno.Select;
 import io.github.ihongs.action.anno.Verify;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Model;
+import io.github.ihongs.util.Digest;
 import java.util.Map;
 
 /**
@@ -39,6 +41,14 @@ public class MasqueAction {
     throws HongsException {
         Model  ett = DB.getInstance("masque").getModel("site");
         Map    req = helper.getRequestData();
+
+        // 自动生成秘钥
+//      if ("-".equals(req.get("sk"))) {
+            req.put("sk", Digest.md5(Core.newIdentity()));
+//      } else {
+//          req.remove("sk");
+//      }
+
         Map    rsp = ett.create(req);
         helper.reply("", rsp);
     }
@@ -51,6 +61,14 @@ public class MasqueAction {
     throws HongsException {
         Model  ett = DB.getInstance("masque").getModel("site");
         Map    req = helper.getRequestData();
+
+        // 重新生成秘钥
+        if ("-".equals(req.get("sk"))) {
+            req.put("sk", Digest.md5(Core.newIdentity()));
+        } else {
+            req.remove("sk");
+        }
+
         int    num = ett.update(req);
         helper.reply("", num);
     }

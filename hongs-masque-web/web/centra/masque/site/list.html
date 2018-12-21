@@ -1,3 +1,4 @@
+<h2>站点管理</h2>
 <div id="masque-site-list"
      data-module="hsList"
      data-load-url="centra/masque/site/search.act?dept_id=${dept_id}&amp;ob=-mtime&amp;with-depts=1"
@@ -24,9 +25,10 @@
                     <th data-fn="id[]" data-ft="_check" class="_check">
                         <input type="checkbox" class="checkall" name="id[]"/>
                     </th>
-                    <th data-fn="icon" style="width:50px;">图标</th>
-                    <th data-fn="name" class="sortable">名称</th>
-                    <th data-fn="note" class="sortable">说明</th>
+                    <th data-fn="icon" style="width: 50px;">图标</th>
+                    <th data-fn="id"   style="width:120px;">编号</th>
+                    <th data-fn="name">名称</th>
+                    <th data-fn="note">备注</th>
                     <th data-fn="mtime" data-ft="_htime" data-fl="v*1000" class="_htime sortable">修改时间</th>
                     <th data-fn="ctime" data-ft="_htime" data-fl="v*1000" class="_htime sortable">创建时间</th>
                 </tr>

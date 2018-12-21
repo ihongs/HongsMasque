@@ -1,54 +1,142 @@
 <h2>{DO}站点</h2>
 <div id="masque-site-form"
      data-module="hsForm"
-     data-load-url="centra/masque/site/search.act"
-     data-save-url="centra/master/user/update.act"
-     data-data-0="_fill_head:(hsFormFillView)">
-    <form action="" method="POST" enctype="multipart/form-data">
-        <div class="row">
-            <div class="col-xs-6 center-block">
-                <div class="form-group">
-                    <label class="control-label">编号</label>
-                    <input type="text" name="id" class="form-control" required="required" readonly="readonly"/>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">秘钥</label>
-                    <input type="text" name="sk" class="form-control" required="required" readonly="readonly"/>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">名称</label>
-                    <input type="text" name="name" class="form-control" required="required"/>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">备注</label>
-                    <input type="text" name="note" class="form-control"/>
-                </div>
-                <div class="form-group dont-close">
-                    <label class="control-label">头像</label>
-                    <input type="text" name="head" class="invisible form-ignored"/>
-                    <input type="file" name="head" class="invisible form-ignored" accept="image/*"/>
-                    <ul class="pickbox" data-fn="head" data-size="256*256"></ul>
-                    <button type="button" class="btn btn-default form-control" data-toggle="hsView">请选择头像</button>
-                    <p class="help-block">缩略图比例 1:1, 推荐分辨率 64*64 到 256*256 (像素)</p>
+     data-load-url="centra/masque/site/search.act?id=${id}"
+     data-save-url="centra/masque/site/update.act?id=${id}"
+     data-data-0="_fill_icon:(hsFormFillView)">
+    <form action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-xs-3">编号</label>
+            <div class="col-xs-6">
+                <input type="hidden" name="id" class="form-ignored"/>
+                <div class="input-group">
+                    <input type="text" class="form-control" style="font-family: monospace;" readonly="readonly" data-fn="site_id" data-fl="form._info.id"/>
+                    <a href="javascript:;" class="input-group-addon copy-code">复制</a>
                 </div>
             </div>
+            <div class="col-xs-3 help-block"></div>
         </div>
         <div class="form-group">
-            <button type="submit" class="ensure btn btn-primary">提交</button>
-            <button type="button" class="cancel btn btn-link"   >取消</button>
+            <label class="control-label col-xs-3">秘钥</label>
+            <div class="col-xs-6">
+                <input type="hidden" name="sk" class="form-ignored"/>
+                <div class="input-group">
+                    <input type="text" class="form-control" style="font-family: monospace;" readonly="readonly" data-fn="site_sk" data-fl="form._info.sk"/>
+                    <a href="javascript:;" class="input-group-addon rese-code">重置</a>
+                    <a href="javascript:;" class="input-group-addon copy-code">复制</a>
+                </div>
+            </div>
+            <div class="col-xs-3 help-block"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">名称</label>
+            <div class="col-xs-6">
+                <input type="text" name="name" class="form-control" required="required"/>
+            </div>
+            <div class="col-xs-3 help-block"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">备注</label>
+            <div class="col-xs-6">
+                <input type="text" name="note" class="form-control"/>
+            </div>
+            <div class="col-xs-3 help-block"></div>
+        </div>
+        <div class="form-group dont-close">
+            <label class="control-label col-xs-3">图标</label>
+            <div class="col-xs-6">
+                <input type="text" name="head" class="invisible form-ignored"/>
+                <input type="file" name="head" class="invisible form-ignored" accept="image/*"/>
+                <ul class="pickbox"  data-fn="head"  data-mode="pick"  data-size="256*256"></ul>
+                <button type="button" class="btn btn-default form-control" data-toggle="hsView">请选择头像</button>
+                <p class="form-control-static">缩略图比例 1:1, 推荐分辨率 64*64 到 256*256 (像素)</p>
+            </div>
+            <div class="col-xs-3 help-block"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">房间信息接口 URL</label>
+            <div class="col-xs-6">
+                <input type="url" name="room_url" class="form-control"/>
+            </div>
+            <div class="col-xs-3 help-block"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">人员信息接口 URL</label>
+            <div class="col-xs-6">
+                <input type="url" name="mate_url" class="form-control"/>
+            </div>
+            <div class="col-xs-3 help-block"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">离线通知接口 URL</label>
+            <div class="col-xs-6">
+                <input type="url" name="note_url" class="form-control"/>
+            </div>
+            <div class="col-xs-3 help-block"></div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-6 col-xs-offset-3">
+                <button type="submit" class="ensure btn btn-primary">提交</button>
+                <button type="button" class="cancel btn btn-link"   >取消</button>
+            </div>
         </div>
     </form>
 </div>
 <script type="text/javascript">
     (function($) {
-        var context = $("#master-user-form");
+        var context = $("#masque-site-form");
+        var id = H$("&id", context);
 
-        if (!H$("&id", context)) {
+        if ( ! id ) {
             context.attr("data-save-url", context.attr("data-save-url")
                    .replace("update.act", "create.act"));
+            
             // 创建模型下无需显示编号和秘钥
-            context.find("[name=id]").closest(".form-group").remove();
-            context.find("[name=sk]").closest(".form-group").remove();
+            context.find("[name=id]").closest(".form-group").addClass("invisible");
+            context.find("[name=sk]").closest(".form-group").addClass("invisible");
+            context.find("[name=sk]").val("-");
+        } else {
+            // 复制编号或秘钥
+            context.on("click", ".copy-code", function() {
+                try {
+                    $(this).siblings("input")[0].select();
+                    document.execCommand("Copy");
+                    $.hsNote("复制成功! 可去其他位置粘贴.");
+                } catch (e) {
+                    console.log(e);
+                    $.hsWarn("复制失败, 请自行选择和复制.");
+                }
+            });
+            
+            // 重新去生成秘钥
+            context.on("click", ".rese-code", function() {
+                $.hsWarn(
+                    {
+                        "title": "警告",
+                        "notes": "此操作不可逆, 秘钥一旦重置, 所有使用旧秘钥连接的程序都将失效, 您必须改写所有对接程序, 使用新的秘钥并重建连接.",
+                        "class": "alert-warning",
+                        "focus": 1
+                    },
+                    {
+                        "label": "了解, 立即重置",
+                        "class": "btn-primary",
+                        "click": function() {
+                            $.ajax({
+                                url : hsFixUri("centra/masque/site/update.act"),
+                                data: { id: id, sk: "-" },
+                                success: function() {
+                                    context.data("HsForm").load();
+                                    $.hsNote("秘钥已重置, 请复制并重新配置您的连接程序.");
+                                }
+                            });
+                        }
+                    },
+                    {
+                        "label": "取消",
+                        "class": "btn-default"
+                    }
+                );
+            });
         }
     })(jQuery);
 </script>

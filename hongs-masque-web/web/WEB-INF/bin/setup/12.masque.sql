@@ -6,9 +6,9 @@
 
 DROP TABLE IF EXISTS `a_masque_site`;
 CREATE TABLE `a_masque_site` (
-  `id` CHAR(14) NOT NULL,
+  `id` CHAR(16) NOT NULL,
   `sk` CHAR(32) NOT NULL,
-  `user_id` CHAR(14) DEFAULT NULL, /* 关联的属主 */
+  `user_id` CHAR(16) DEFAULT NULL, /* 关联的属主 */
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
   `icon` VARCHAR(100) DEFAULT NULL,
@@ -30,14 +30,14 @@ CREATE INDEX `IK_a_masque_site_state` ON `a_masque_site` (`state`);
 
 DROP TABLE IF EXISTS `a_masque_chat`;
 CREATE TABLE `a_masque_chat` (
-  `id` CHAR(14) NOT NULL,
-  `site_id` CHAR(14) NOT NULL,
+  `id` CHAR(16) NOT NULL,
+  `site_id` CHAR(16) NOT NULL,
   `room_id` VARCHAR(32) NOT NULL,
   `mate_id` VARCHAR(32) NOT NULL,
   `kind` VARCHAR(10) DEFAULT 'text',
   `note` TEXT DEFAULT NULL,
   `data` TEXT DEFAULT NULL,
-  `ctime` BIGINT(14) UNSIGNED DEFAULT NULL,
+  `ctime` BIGINT UNSIGNED DEFAULT NULL, /* 注意: 这里是毫秒 */
   `state` TINYINT DEFAULT '1',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
@@ -55,8 +55,8 @@ CREATE INDEX `IK_a_masque_chat_state` ON `a_masque_chat` (`state`);
 
 DROP TABLE IF EXISTS `a_masque_stat`;
 CREATE TABLE `a_masque_stat` (
-  `id` CHAR(14) NOT NULL,
-  `site_id` CHAR(14) NOT NULL,
+  `id` CHAR(16) NOT NULL,
+  `site_id` CHAR(16) NOT NULL,
   `room_id` VARCHAR(32) NOT NULL,
   `mate_id` VARCHAR(32) NOT NULL,
   `fresh` INTEGER UNSIGNED DEFAULT 0,
@@ -76,8 +76,8 @@ CREATE INDEX `IK_a_masque_stat_mate` ON `a_masque_stat` (`mate_id`);
 
 DROP TABLE IF EXISTS `a_masque_room`;
 CREATE TABLE `a_masque_room` (
-  `id` CHAR(14) NOT NULL,
-  `site_id` CHAR(14) NOT NULL,
+  `id` CHAR(16) NOT NULL,
+  `site_id` CHAR(16) NOT NULL,
   `room_id` VARCHAR(32) DEFAULT NULL,
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
@@ -100,8 +100,8 @@ CREATE INDEX `IK_a_masque_room_state` ON `a_masque_room` (`state`);
 
 DROP TABLE IF EXISTS `a_masque_mate`;
 CREATE TABLE `a_masque_mate` (
-  `id` CHAR(14) NOT NULL,
-  `site_id` CHAR(14) NOT NULL,
+  `id` CHAR(16) NOT NULL,
+  `site_id` CHAR(16) NOT NULL,
   `mate_id` VARCHAR(32) DEFAULT NULL,
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
@@ -117,3 +117,10 @@ CREATE UNIQUE INDEX `UK_a_masque_mate` ON `a_masque_mate` (`site_id`,`mate_id`);
 CREATE INDEX `IK_a_masque_mate_site` ON `a_masque_mate` (`site_id`);
 CREATE INDEX `IK_a_masque_mate_code` ON `a_masque_mate` (`mate_id`);
 CREATE INDEX `IK_a_masque_mate_state` ON `a_masque_mate` (`state`);
+
+--
+-- 管理员权限
+--
+
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/search');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/update');
