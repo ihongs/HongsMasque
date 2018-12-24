@@ -1,0 +1,52 @@
+<h2>{DO}站点</h2>
+<div id="masque-room-form"
+     data-module="hsForm"
+     data-load-url="centra/masque/room/search.act?id=${id}"
+     data-save-url="centra/masque/room/update.act?id=${id}"
+     data-data-0="_fill_icon:(hsFormFillView)">
+    <form action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        <input type="hidden" name="site_id"/>
+        <div class="form-group">
+            <label class="control-label col-xs-3">名称</label>
+            <div class="col-xs-6">
+                <input type="text" name="name" class="form-control" required="required"/>
+            </div>
+            <div class="col-xs-3 help-block form-control-static"></div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">备注</label>
+            <div class="col-xs-6">
+                <input type="text" name="note" class="form-control"/>
+            </div>
+            <div class="col-xs-3 help-block form-control-static"></div>
+        </div>
+        <div class="form-group dont-close">
+            <label class="control-label col-xs-3">图标</label>
+            <div class="col-xs-6">
+                <input type="text" name="head" class="invisible form-ignored"/>
+                <input type="file" name="head" class="invisible form-ignored" accept="image/*"/>
+                <ul class="pickbox"  data-fn="head"  data-mode="pick"  data-size="256*256"></ul>
+                <button type="button" class="btn btn-default form-control" data-toggle="hsView">请选择头像</button>
+                <p class="form-control-static">缩略图比例 1:1, 推荐分辨率 64*64 到 256*256 (像素)</p>
+            </div>
+            <div class="col-xs-3 help-block form-control-static"></div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-6 col-xs-offset-3">
+                <button type="submit" class="ensure btn btn-primary">提交</button>
+                <button type="button" class="cancel btn btn-link"   >取消</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    (function($) {
+        var context = $("#masque-room-form");
+        var id = H$("&id", context);
+
+        if ( ! id ) {
+            context.attr("data-save-url", context.attr("data-save-url")
+                   .replace("update.act", "create.act"));
+        }
+    })(jQuery);
+</script>
