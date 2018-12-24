@@ -1,0 +1,84 @@
+<h2>站点管理</h2>
+<div id="masque-mate-list"
+     data-module="hsList"
+     data-load-url="centra/masque/mate/search.act?site_id=${site_id}"
+     data-open-urls-0="['centra/masque/mate/form.html','.create','@']"
+     data-open-urls-1="['centra/masque/mate/form.html?id={ID}','.modify','@']"
+     data-send-urls-0="['centra/masque/mate/delete.act','.delete','您确定要删除此站点?']">
+    <div class="clearfix">
+        <div class="toolbox col-xs-8 btn-group">
+            <button type="button" class="create btn btn-default">创建房间</button>
+            <button type="button" class="modify for-choose btn btn-default">修改</button>
+            <button type="button" class="delete for-checks btn btn-warning" title="删除"><span class="glyphicon glyphicon-trash"></span></button>
+        </div>
+        <form class="findbox col-xs-4 input-group" action="" method="POST">
+            <input type="search" name="wd" class="form-control input-search"/>
+            <span class="input-group-btn">
+                <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+            </span>
+        </form>
+    </div>
+    <div class="listbox table-responsive">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th data-fn="id[]" data-ft="_check" class="_check">
+                        <input type="checkbox" class="checkall" name="id[]"/>
+                    </th>
+                    <th data-fn="icon" style="width: 50px;">图标</th>
+                    <th data-fn="mate_id" style="width:120px;">代号</th>
+                    <th data-fn="name">名称</th>
+                    <th data-fn="note">备注</th>
+                    <th data-fn="mtime" data-ft="_htime" data-fl="v*1000" class="_htime sortable">修改时间</th>
+                    <th data-fn="ctime" data-ft="_htime" data-fl="v*1000" class="_htime sortable">创建时间</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="pagebox"></div>
+
+    <div class="modal in" style="z-index: 99999; display: none;">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">查看图标</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="text-align:center;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    (function($) {
+        var context = $("#masque-mate-list");
+        var viewImg = context.find(".modal");
+
+        viewImg.modal("hide");
+
+        context.data("_fill_icon" , function(c, v, n) {
+            if (!v) {
+                var u = "static/assets/img/head_icon_sm.jpg";
+                $('<a href="javascript:;">'
+                 +'<span style="background-image:url('+u+');'
+                 +'display:inline-block;width:32px;height:32px;border-radius:32px;margin-top:-5px;margin-bottom:-10px;background-position:center;background-repeat:no-repeat;"/></a>')
+                .appendTo(c);
+            } else {
+                var u = v.replace(/(_[^_]+)?\.[^\.]+$/, "_sm.png");
+                $('<a href="javascript:;" data-href="'+v+'">'
+                 +'<span style="background-image:url('+u+');'
+                 +'display:inline-block;width:32px;height:32px;border-radius:32px;margin-top:-5px;margin-bottom:-10px;background-position:center;background-repeat:no-repeat;"/></a>')
+                .appendTo(c)
+                .click( function( ) {
+                    var v = $(this).attr("data-href");
+                    viewImg.find(".modal-body div").empty()
+                           .append('<img src="'+v+'" style="max-width:100%;margin:0px auto;"/>');
+                    viewImg.modal("show");
+                });
+            }
+        });
+    })(jQuery);
+</script>
