@@ -1,15 +1,15 @@
-<h2>{DO}房间</h2>
-<div id="masque-room-form"
+<h2>{DO}人员</h2>
+<div id="masque-mate-form"
      data-module="hsForm"
-     data-load-url="centra/masque/room/search.act?id=${id}"
-     data-save-url="centra/masque/room/update.act?id=${id}"
+     data-load-url="centra/masque/mate/search.act?id=${id}"
+     data-save-url="centra/masque/mate/update.act?id=${id}"
      data-data-0="_fill_icon:(hsFormFillView)">
     <form action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
         <input type="hidden" name="site_id"/>
         <div class="form-group">
             <label class="control-label col-xs-3">编号</label>
             <div class="col-xs-6">
-                <input type="text" name="room_id" class="form-control" required="required"/>
+                <input type="text" name="mate_id" class="form-control" required="required"/>
             </div>
             <div class="col-xs-3 help-block form-control-static"></div>
         </div>
@@ -48,7 +48,7 @@
 </div>
 <script type="text/javascript">
     (function($) {
-        var context = $("#masque-room-form");
+        var context = $("#masque-mate-form");
         var id = H$("&id", context);
 
         if ( ! id ) {
