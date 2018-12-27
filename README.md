@@ -40,4 +40,4 @@ sh bin/hdo server.start --DEBUG 1
 
 Windows 下进入此项目文件夹, 双击 `setup.bat` 即可完成设置, 双击 `start.bat` 立即启动服务; 注意: Windows 下如需关闭服务程序, 务必要在命令窗口按 `Ctrl+C` 中止进程, 不要直接关闭命令窗口. 后者导致下次无法启动, 可尝试删除 `var/server/8080.pid` 后重新启动.
 
-浏览器打开 `http://localhost:8080/` 可进入后台.
+浏览器打开 <http://localhost:8080/> 可进入后台.
