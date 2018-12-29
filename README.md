@@ -36,6 +36,8 @@ sh bin/hdo system.setup --DEBUG 0
 sh bin/hdo server.start --DEBUG 1
 ```
 
-可以将构建的 `hongs-masque-web/target/HongsMasque` 拷贝出来, 这是最终的应用目录. Windows 下在此目录, 双击 `setup.bat` 即可完成设置, 双击 `start.bat` 立即启动服务; 注意: Windows 下关闭服务程序务必在命令窗口按 Ctrl+C 中止进程, 不要直接关闭命令窗口, 后者导致下次启动不了可尝试删除 `var/server/8080.pid` 文件再重新启动.
+可以将构建的 `hongs-masque-web/target/HongsMasque` 拷贝出来, 这是最终的应用目录. 也可以发邮件到 kevin.hongs@gmail.com 索要构建好的包(JDK 请自行下载和安装).
 
-浏览器打开 `http://localhost:8080/` 进入后台.
+Windows 下进入此项目文件夹, 双击 `setup.bat` 即可完成设置, 双击 `start.bat` 立即启动服务; 注意: Windows 下如需关闭服务程序, 务必要在命令窗口按 `Ctrl+C` 中止进程, 不要直接关闭命令窗口. 后者导致下次无法启动, 可尝试删除 `var/server/8080.pid` 后重新启动.
+
+浏览器打开 <http://localhost:8080/> 可进入后台.
