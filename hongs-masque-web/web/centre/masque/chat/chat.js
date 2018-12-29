@@ -32,8 +32,8 @@ HsChat.prototype = {
         var that = this;
         function reconnect() {
             hsNote(
-                "通讯已断开, 即将重连...", "warn",
-                 function () { that.conn(uri) }, 3
+                "通讯已断开, 即将重连...", "warning",
+                 function () { that.conn( uri ); }, 3
             );
         }
         wsobj.onclose = reconnect;
