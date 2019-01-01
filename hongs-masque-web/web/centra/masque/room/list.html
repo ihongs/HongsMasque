@@ -1,13 +1,13 @@
-<h2>站点管理</h2>
+<h2>频道管理</h2>
 <div id="masque-room-list"
      data-module="hsList"
      data-load-url="centra/masque/room/search.act?site_id=${site_id}&amp;ob=-mtime,-ctime"
-     data-open-urls-0="['centra/masque/room/form.html','.create','@']"
-     data-open-urls-1="['centra/masque/room/form.html?id={ID}','.modify','@']"
-     data-send-urls-0="['centra/masque/room/delete.act','.delete','您确定要删除此站点?']">
+     data-send-urls-0="['centra/masque/room/delete.act','.delete','您确定要删除此频道?']"
+     data-open-urls-0="['centra/masque/room/form.html?site_id=${site_id}','.create','@']"
+     data-open-urls-1="['centra/masque/room/form.html?id={ID}','.modify','@']">
     <div class="clearfix">
         <div class="toolbox col-xs-8 btn-group">
-            <button type="button" class="create btn btn-default">创建房间</button>
+            <button type="button" class="create btn btn-default">添加频道</button>
             <button type="button" class="modify for-choose btn btn-default">修改</button>
             <button type="button" class="delete for-checks btn btn-warning" title="删除"><span class="glyphicon glyphicon-trash"></span></button>
         </div>

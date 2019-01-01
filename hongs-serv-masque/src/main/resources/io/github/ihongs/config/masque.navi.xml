@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <menu text="站点管理" href="centra/masque/">
+        <role text="查阅数据" name="centra/masque/search">
+            <action>centra/masque/site/search.act</action>
+            <action>centra/masque/room/search.act</action>
+            <action>centra/masque/mate/search.act</action>
+        </role>
+        <role text="维护信息" name="centra/masque/update">
+            <depend>centra/masque/search</depend>
+            <action>centra/masque/site/create.act</action>
+            <action>centra/masque/site/update.act</action>
+            <action>centra/masque/site/delete.act</action>
+            <action>centra/masque/room/create.act</action>
+            <action>centra/masque/room/update.act</action>
+            <action>centra/masque/room/delete.act</action>
+            <action>centra/masque/mate/create.act</action>
+            <action>centra/masque/mate/update.act</action>
+            <action>centra/masque/mate/delete.act</action>
+        </role>
+    </menu>
+</root>

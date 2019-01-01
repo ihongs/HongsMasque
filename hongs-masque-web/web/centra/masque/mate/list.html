@@ -1,13 +1,13 @@
-<h2>站点管理</h2>
+<h2>成员管理</h2>
 <div id="masque-mate-list"
      data-module="hsList"
      data-load-url="centra/masque/mate/search.act?site_id=${site_id}&amp;ob=-mtime,-ctime"
-     data-open-urls-0="['centra/masque/mate/form.html','.create','@']"
-     data-open-urls-1="['centra/masque/mate/form.html?id={ID}','.modify','@']"
-     data-send-urls-0="['centra/masque/mate/delete.act','.delete','您确定要删除此站点?']">
+     data-send-urls-0="['centra/masque/mate/delete.act','.delete','您确定要删除此成员?']"
+     data-open-urls-0="['centra/masque/mate/form.html?site_id=${site_id}','.create','@']"
+     data-open-urls-1="['centra/masque/mate/form.html?id={ID}','.modify','@']">
     <div class="clearfix">
         <div class="toolbox col-xs-8 btn-group">
-            <button type="button" class="create btn btn-default">创建房间</button>
+            <button type="button" class="create btn btn-default">添加成员</button>
             <button type="button" class="modify for-choose btn btn-default">修改</button>
             <button type="button" class="delete for-checks btn btn-warning" title="删除"><span class="glyphicon glyphicon-trash"></span></button>
         </div>
@@ -25,7 +25,7 @@
                     <th data-fn="id[]" data-ft="_check" class="_check">
                         <input type="checkbox" class="checkall" name="id[]"/>
                     </th>
-                    <th data-fn="icon" style="width: 50px;">图标</th>
+                    <th data-fn="icon" style="width: 50px;">头像</th>
                     <th data-fn="mate_id" class="id" style="width: 120px;">代号</th>
                     <th data-fn="name">名称</th>
                     <th data-fn="note">备注</th>

@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
+    <form name="site">
+        <field name="id" type="string"></field>
+        <field name="sk" type="string"></field>
+        <field name="name" text="名称"></field>
+        <field name="note" text="备注"></field>
+        <field name="icon" text="图标" rule="Thumb">
+            <param name="href">static/upload/masque/site</param>
+            <param name="path">static/upload/masque/site</param>
+            <param name="thumb-extn">png</param>
+            <param name="thumb-mode">pick</param>
+            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
+            <param name="down-remote">yes</param>
+        </field>
+        <field name="room_url" text="房间信息接口"></field>
+        <field name="mate_url" text="人员信息接口"></field>
+        <field name="note_url" text="离线通知接口"></field>
+    </form>
+    <form name="room">
+        <field name="id" type="string"></field>
+        <field name="site_id" type="站点"></field>
+        <field name="room_id" text="代号"></field>
+        <field name="name" text="名称"></field>
+        <field name="note" text="备注"></field>
+        <field name="icon" text="图标" rule="Thumb">
+            <param name="href">static/upload/masque/room</param>
+            <param name="path">static/upload/masque/room</param>
+            <param name="thumb-extn">png</param>
+            <param name="thumb-mode">pick</param>
+            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
+            <param name="down-remote">yes</param>
+        </field>
+    </form>
+    <form name="mate">
+        <field name="id" type="string"></field>
+        <field name="site_id" type="站点"></field>
+        <field name="mate_id" text="代号"></field>
+        <field name="name" text="名称"></field>
+        <field name="note" text="备注"></field>
+        <field name="icon" text="图标" rule="Thumb">
+            <param name="href">static/upload/masque/mate</param>
+            <param name="path">static/upload/masque/mate</param>
+            <param name="thumb-extn">png</param>
+            <param name="thumb-mode">pick</param>
+            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
+            <param name="down-remote">yes</param>
+        </field>
+    </form>
     <form name="auth">
         <field name="site_id" required="yes"></field>
         <field name="mine_id" required="yes"></field>
@@ -35,51 +82,4 @@
         <value code="video">视频</value>
         <value code="voice">语音</value>
     </enum>
-    <form name="site">
-        <field name="id" type="string"></field>
-        <field name="sk" type="string"></field>
-        <field name="name" text="名称"></field>
-        <field name="note" text="备注"></field>
-        <field name="icon" text="图标">
-            <param name="href">static/upload/masque/site</param>
-            <param name="path">static/upload/masque/site</param>
-            <param name="thumb-extn">png</param>
-            <param name="thumb-mode">pick</param>
-            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
-            <param name="down-remote">yes</param>
-        </field>
-        <field name="room_url" text="房间信息接口"></field>
-        <field name="mate_url" text="人员信息接口"></field>
-        <field name="note_url" text="离线通知接口"></field>
-    </form>
-    <form name="room">
-        <field name="id" type="string"></field>
-        <field name="site_id" type="站点"></field>
-        <field name="room_id" text="代号"></field>
-        <field name="name" text="名称"></field>
-        <field name="note" text="备注"></field>
-        <field name="icon" text="图标">
-            <param name="href">static/upload/masque/room</param>
-            <param name="path">static/upload/masque/room</param>
-            <param name="thumb-extn">png</param>
-            <param name="thumb-mode">pick</param>
-            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
-            <param name="down-remote">yes</param>
-        </field>
-    </form>
-    <form name="mate">
-        <field name="id" type="string"></field>
-        <field name="site_id" type="站点"></field>
-        <field name="mate_id" text="代号"></field>
-        <field name="name" text="名称"></field>
-        <field name="note" text="备注"></field>
-        <field name="icon" text="图标">
-            <param name="href">static/upload/masque/mate</param>
-            <param name="path">static/upload/masque/mate</param>
-            <param name="thumb-extn">png</param>
-            <param name="thumb-mode">pick</param>
-            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
-            <param name="down-remote">yes</param>
-        </field>
-    </form>
 </root>
