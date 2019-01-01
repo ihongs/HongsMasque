@@ -2,13 +2,17 @@
 <div id="masque-site-list"
      data-module="hsList"
      data-load-url="centra/masque/site/search.act?ob=-mtime,-ctime"
-     data-open-urls-0="['centra/masque/site/form.html','.create','@']"
+     data-send-urls-0="['centra/masque/site/delete.act','.delete','您确定要删除此站点?']"
+     data-open-urls-0="['centra/masque/site/form.html' ,'.create','@']"
      data-open-urls-1="['centra/masque/site/form.html?id={ID}','.modify','@']"
-     data-send-urls-0="['centra/masque/site/delete.act','.delete','您确定要删除此站点?']">
+     data-open-urls-2="['centra/masque/mate/list.html?site_id={ID}','.into-mate-list','@']"
+     data-open-urls-3="['centra/masque/room/list.html?site_id={ID}','.into-room-list','@']">
     <div class="clearfix">
         <div class="toolbox col-xs-8 btn-group">
             <button type="button" class="create btn btn-default">创建站点</button>
             <button type="button" class="modify for-choose btn btn-default">修改</button>
+            <button type="button" class="into-mate-list for-choose btn btn-default">成员</button>
+            <button type="button" class="into-room-list for-choose btn btn-default">频道</button>
             <button type="button" class="delete for-checks btn btn-warning" title="删除"><span class="glyphicon glyphicon-trash"></span></button>
         </div>
         <form class="findbox col-xs-4 input-group" action="" method="POST">
