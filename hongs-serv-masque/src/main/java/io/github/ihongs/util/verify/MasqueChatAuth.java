@@ -14,12 +14,14 @@ import java.util.Map;
 public class MasqueChatAuth extends Rule {
 
     @Override
-    public Object verify(Object value) throws Wrong, Wrongs, HongsException {
-        String sid   = (String) values.get("site_id");
-        String mid   = (String) values.get("mine_id");
-        String rid   = (String) values.get("room_id");
-        String token = (String) value ;
-        String secur ;
+    public Object verify(Object value, Verity watch) throws Wrong, Wrongs, HongsException {
+        Map values = watch.getValues();
+        Map cleans = watch.getCleans();
+        String sid = (String) values.get("site_id");
+        String mid = (String) values.get("mine_id");
+        String rid = (String) values.get("room_id");
+        String tok = (String) value ;
+        String old ;
 
         Map ro = DB.getInstance ( "masque" )
             .with ("site")
@@ -31,15 +33,15 @@ public class MasqueChatAuth extends Rule {
         }
 
         // 原始 token
-        secur = Digest.md5(sid+"/"+mid+"/"+rid+"/"+ro.get("sk"));
-        if (secur.equals(token)) {
+        old = Digest.md5(sid+"/"+mid+"/"+rid+"/"+ro.get("sk"));
+        if (old.equals(tok)) {
             cleans.put("token_level", 1);
             return value;
         }
 
         // 临时 token
-        token = Synt.asString(Record.get("masque.token."+token));
-        if (secur.equals(token)) {
+        tok = Synt.asString(Record.get("masque.token." + tok));
+        if (old.equals(tok)) {
             cleans.put("token_level", 2);
             return value;
         }

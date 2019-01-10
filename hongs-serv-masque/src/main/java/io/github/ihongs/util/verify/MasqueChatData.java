@@ -16,8 +16,9 @@ import java.util.Map;
 public class MasqueChatData extends Rule {
 
     @Override
-    public Object verify(Object value) throws Wrong, Wrongs, HongsException {
-        String id   = Synt.declare(values.get( "id" ), ""/**/);
+    public Object verify(Object value, Verity watch) throws Wrong, Wrongs, HongsException {
+        Map  values = watch.getValues();
+        String  id  = Synt.declare(values.get( "id" ), ""/**/);
         String kind = Synt.declare(values.get("kind"), "text");
         switch(kind) {
             case "image":
