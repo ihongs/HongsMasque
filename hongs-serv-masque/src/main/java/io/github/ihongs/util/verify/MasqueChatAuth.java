@@ -14,7 +14,7 @@ import java.util.Map;
 public class MasqueChatAuth extends Rule {
 
     @Override
-    public Object verify(Object value, Verity watch) throws Wrong, Wrongs, HongsException {
+    public Object verify(Object value, Veri watch) throws Wrong {
         Map values = watch.getValues();
         Map cleans = watch.getCleans();
         String sid = (String) values.get("site_id");
@@ -23,11 +23,16 @@ public class MasqueChatAuth extends Rule {
         String tok = (String) value ;
         String old ;
 
-        Map ro = DB.getInstance ( "masque" )
+        Map ro;
+        try {
+            ro = DB .getInstance( "masque" )
             .with ("site")
             .field( "sk" )
             .where( "id=? AND state=1", sid)
             .getOne();
+        } catch (HongsException ex) {
+            throw ex.toExemption( );
+        }
         if (ro.isEmpty()) {
             throw new Wrong("core.wrong.sites").setLocalizedContext("masque");
         }
