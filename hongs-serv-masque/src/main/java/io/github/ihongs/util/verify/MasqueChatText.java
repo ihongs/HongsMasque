@@ -12,7 +12,7 @@ import java.util.Map;
 public class MasqueChatText extends Rule {
 
     @Override
-    public Object verify(Object value, Verity watch) throws Wrong, Wrongs, HongsException {
+    public Object verify(Object value, Veri watch) throws Wrong {
         if (null != value && !"".equals(value)) {
             return  value;
         }
@@ -26,10 +26,13 @@ public class MasqueChatText extends Rule {
             case "video":
             case "voice":
                 if (value == null || "".equals(value)) {
+                try {
                     return "["+ FormSet.getInstance ("masque")
                                         .getEnum ("chat_kind")
                                         .get     ( kind ) +"]";
-                }
+                } catch ( HongsException ex) {
+                  throw   ex.toExemption(  );
+                } }
                 return value;
             default:
                 if (value == null || "".equals(value)) {

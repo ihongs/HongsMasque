@@ -1,7 +1,6 @@
 package io.github.ihongs.util.verify;
 
 import io.github.ihongs.Core;
-import io.github.ihongs.HongsException;
 import io.github.ihongs.util.Data;
 import io.github.ihongs.util.Synt;
 import io.github.ihongs.util.Tool;
@@ -16,7 +15,7 @@ import java.util.Map;
 public class MasqueChatData extends Rule {
 
     @Override
-    public Object verify(Object value, Verity watch) throws Wrong, Wrongs, HongsException {
+    public Object verify(Object value, Veri watch) throws Wrong {
         Map  values = watch.getValues();
         String  id  = Synt.declare(values.get( "id" ), ""/**/);
         String kind = Synt.declare(values.get("kind"), "text");
