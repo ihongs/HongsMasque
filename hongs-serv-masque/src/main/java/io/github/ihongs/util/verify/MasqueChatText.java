@@ -12,7 +12,7 @@ import java.util.Map;
 public class MasqueChatText extends Rule {
 
     @Override
-    public Object verify(Object value, Veri watch) throws Wrong {
+    public Object verify(Object value, Wheel watch) throws Wrong {
         if (null != value && !"".equals(value)) {
             return  value;
         }

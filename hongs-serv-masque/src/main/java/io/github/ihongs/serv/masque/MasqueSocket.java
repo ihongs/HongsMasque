@@ -48,9 +48,6 @@ public class MasqueSocket {
             VerifyHelper veri = new VerifyHelper();
             Async< Map > pipe = MasqueTunnel.getCeiver();
 
-            veri.isPrompt(true );
-            veri.isUpdate(false);
-
             /**
              * 这里相较 Action 的校验不同
              * 不能使用 ActionHelper 获取请求数据
@@ -60,7 +57,7 @@ public class MasqueSocket {
             try {
                 data.putAll( hepr.getRequestData() );
                 veri.addRulesByForm( "masque", "auth" );
-                data = veri.verify(data);
+                data = veri.verify(data, false , true );
                 data.put("mate_id",data.get("mine_id"));
                 veri.getRules().clear( );
                 veri.addRulesByForm( "masque", "chat" );
@@ -109,7 +106,7 @@ public class MasqueSocket {
             try {
                 dat.putAll(data);
                 dat.put("id", Core.newIdentity());
-                dat = veri.verify( dat );
+                dat = veri.verify( dat, false, true);
             } catch (Wrongs wr) {
                 hepr.reply( wr.toReply(( byte ) 9 ));
                 return;
