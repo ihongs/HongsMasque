@@ -14,7 +14,7 @@ import java.util.Map;
 public class MasqueChatAuth extends Rule {
 
     @Override
-    public Object verify(Object value, Veri watch) throws Wrong {
+    public Object verify(Object value, Wheel watch) throws Wrong {
         Map values = watch.getValues();
         Map cleans = watch.getCleans();
         String sid = (String) values.get("site_id");

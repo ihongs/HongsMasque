@@ -15,7 +15,7 @@ import java.util.Map;
 public class MasqueChatData extends Rule {
 
     @Override
-    public Object verify(Object value, Veri watch) throws Wrong {
+    public Object verify(Object value, Wheel watch) throws Wrong {
         Map  values = watch.getValues();
         String  id  = Synt.declare(values.get( "id" ), ""/**/);
         String kind = Synt.declare(values.get("kind"), "text");
