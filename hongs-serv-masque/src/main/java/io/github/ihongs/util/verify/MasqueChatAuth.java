@@ -14,13 +14,14 @@ import java.util.Map;
 public class MasqueChatAuth extends Rule {
 
     @Override
-    public Object verify(Object value, Wheel watch) throws Wrong {
+    public Object verify(Value watch) throws Wrong {
+        Object val = watch.get();
         Map values = watch.getValues();
         Map cleans = watch.getCleans();
         String sid = (String) values.get("site_id");
         String mid = (String) values.get("mine_id");
         String rid = (String) values.get("room_id");
-        String tok = (String) value ;
+        String tok = (String) val ;
         String old ;
 
         Map ro;
@@ -41,14 +42,14 @@ public class MasqueChatAuth extends Rule {
         old = Digest.md5(sid+"/"+mid+"/"+rid+"/"+ro.get("sk"));
         if (old.equals(tok)) {
             cleans.put("token_level", 1);
-            return value;
+            return val;
         }
 
         // 临时 token
         tok = Synt.asString(Record.get("masque.token." + tok));
         if (old.equals(tok)) {
             cleans.put("token_level", 2);
-            return value;
+            return val;
         }
 
         /**/throw new Wrong("core.wrong.token").setLocalizedContext("masque");
