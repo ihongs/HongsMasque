@@ -12,20 +12,17 @@ import java.util.Map;
 public class MasqueChatText extends Rule {
 
     @Override
-    public Object verify(Object value, Wheel watch) throws Wrong {
-        if (null != value && !"".equals(value)) {
-            return  value;
-        }
-
-        Map  values = watch.getValues();
-        String kind = Synt.declare(values.get("kind"), "text");
+    public Object verify(Value watch) throws Wrong {
+        Object val  = watch.get();
+        Map    vals = watch.getValues();
+        String kind = Synt.declare(vals.get("kind"), "text");
         switch(kind) {
             case "link" :
             case "file" :
             case "image":
             case "video":
             case "voice":
-                if (value == null || "".equals(value)) {
+                if (val == null || "".equals(val)) {
                 try {
                     return "["+ FormSet.getInstance ("masque")
                                         .getEnum ("chat_kind")
@@ -33,12 +30,12 @@ public class MasqueChatText extends Rule {
                 } catch ( HongsException ex) {
                   throw   ex.toExemption(  );
                 } }
-                return value;
+                return val;
             default:
-                if (value == null || "".equals(value)) {
+                if (val == null || "".equals(val)) {
                     throw  new  Wrong ( "fore.form.required" );
                 }
-                return value;
+                return val;
         }
     }
 
