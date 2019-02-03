@@ -35,7 +35,7 @@ public class MasqueChatAuth extends Rule {
             throw ex.toExemption( );
         }
         if (ro.isEmpty()) {
-            throw new Wrong("core.wrong.sites").setLocalizedContext("masque");
+            throw new Wrong("core.masque.wrong.sites").setLocalizedContext("masque");
         }
 
         // 原始 token
@@ -52,7 +52,7 @@ public class MasqueChatAuth extends Rule {
             return val;
         }
 
-        /**/throw new Wrong("core.wrong.token").setLocalizedContext("masque");
+        /**/throw new Wrong("core.masque.wrong.token").setLocalizedContext("masque");
     }
 
 }

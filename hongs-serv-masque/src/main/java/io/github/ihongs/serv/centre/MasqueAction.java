@@ -281,8 +281,9 @@ public class MasqueAction {
             return;
         }
 
+        // 生成临时 token 一天有效
         String sec = Digest.md5(tok+"."+Core.newIdentity());
-        Record.put( "masque.token."+sec, tok, (3600 * 24) ); // 有效期 1 天
+        Record.put( "masque.token."+sec, tok, (3600 * 24) );
 
         helper.reply(Synt.mapOf(
             "token", sec
@@ -305,7 +306,8 @@ public class MasqueAction {
             return;
         }
 
-        Record.del( "masque.token."+tok ); // 移除当前 token
+        // 移除当前 token
+        Record.del( "masque.token."+tok );
 
         helper.reply("");
     }

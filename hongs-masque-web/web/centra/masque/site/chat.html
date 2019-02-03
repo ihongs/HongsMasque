@@ -1,24 +1,27 @@
-<h2>{DO}站点</h2>
+<h2>聊天测试</h2>
 <div id="masque-site-chat">
-    <form class="form-horizontal">
+    <form class="form-horizontal" data-module="hsForm">
         <div class="form-group">
-            <label class="control-label col-xs-3">站点</label>
+            <label class="control-label col-xs-3">成员</label>
             <div class="col-xs-6">
-                
+                <div class="input-group">
+                    <input type="text" name="mine_id" class="form-control">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default choose" data-href="centra/masque/mate/pick.html">选择成员</button>
+                    </div>
+                </div>
             </div>
             <div class="col-xs-3 help-block form-control-static"></div>
         </div>
         <div class="form-group">
-            <label class="control-label col-xs-3">人员</label>
+            <label class="control-label col-xs-3">频道</label>
             <div class="col-xs-6">
-                
-            </div>
-            <div class="col-xs-3 help-block form-control-static"></div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-xs-3">房间</label>
-            <div class="col-xs-6">
-                
+                <div class="input-group">
+                    <input type="text" name="room_id" class="form-control"/>
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default choose" data-href="centra/masque/room/pick.html">选择频道</button>
+                    </div>
+                </div>
             </div>
             <div class="col-xs-3 help-block form-control-static"></div>
         </div>
@@ -28,29 +31,112 @@
                 <button type="button" class="cancel btn btn-link"   >关闭</button>
             </div>
         </div>
-        <fieldset>
-            <legend>连接参数</legend>
-            <div class="form-group">
-                <label class="control-label col-xs-3">site_id</label>
-                <div class="col-xs-6">
-                    <p class="form-control-static"></p>
-                </div>
-                <div class="col-xs-3 help-block form-control-static"></div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-xs-3">mine_id</label>
-                <div class="col-xs-6">
-                    <p class="form-control-static"></p>
-                </div>
-                <div class="col-xs-3 help-block form-control-static"></div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-xs-3">room_id</label>
-                <div class="col-xs-6">
-                    <p class="form-control-static"></p>
-                </div>
-                <div class="col-xs-3 help-block form-control-static"></div>
-            </div>
-        </fieldset>
     </form>
+    <fieldset class="form-horizontal" style="display: none;">
+        <legend>连接参数</legend>
+        <div class="form-group">
+            <label class="control-label col-xs-3">口令</label>
+            <div class="col-xs-9">
+                <p class="form-control-static"><b data-fn="tok"></b></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">链接</label>
+            <div class="col-xs-9">
+                <p class="form-control-static"><a data-fn="url"></a></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-3">WebSocket 链接</label>
+            <div class="col-xs-9">
+                <p class="form-control-static"><a data-fn="wsl"></a></p>
+            </div>
+        </div>
+    </fieldset>
 </div>
+<script type="text/javascript">
+(function($) {
+    var context = H$("#masque-site-chat");
+    var siteId  = H$("@id", context);
+    var siteSk  = null;
+
+    // 表单校验
+    context.find("form input")
+           .attr("data-validate" , "validate" )
+           .data("validate", function(val, inp) {
+        if (!val && !inp.data("value")) {
+            return "请选取或填入 ID";
+        }
+        return true;
+    });
+
+    // 获取口令, 然后生成链接
+    context.on("willSave", "form", function(ev) {
+        ev.stopPropagation();
+        ev.preventDefault ();
+
+        var mine = $(this).find("[name=mine_id]");
+        var room = $(this).find("[name=room_id]");
+        var mineId = mine.val() || mine.data("value");
+        var roomId = room.val() || room.data("value");
+
+        $.hsAjax({
+            url : "centra/masque/token/create.act",
+            data: {
+                site_id: siteId,
+                mine_id: mineId,
+                room_id: roomId,
+                token  : siteSk
+            },
+            type: "POST",
+            dataKind: "form",
+            dataType: "json",
+            success : function(v) {
+                v = hsResponse(v);
+                var tok = v.token;
+                var pre = hsFixUri("").replace(/^\w+:\/\/[^\/]+/, "");
+                var url = pre + "centre/masque/chat/?s="+siteId+"&m="+mineId+"&r="+roomId+"&t="+tok;
+                var wsl = pre + "centre/masque/socket/"+siteId+"/"+mineId+"/"+roomId+"/?token="+tok;
+
+                // 加上当前域名和通讯协议
+                url = location.host + url;
+                wsl = location.host + wsl;
+                if  ( location.protocol == "https:") {
+                    url = "https://"+ url;
+                    wsl =   "wss://"+ wsl;
+                } else {
+                    url =  "http://"+ url;
+                    wsl =    "ws://"+ wsl;
+                }
+
+                context.find("[data-fn=tok]").text( tok );
+                context.find("[data-fn=url]").attr("href", url).text(url);
+                context.find("[data-fn=wsl]").attr("href", wsl).text(wsl);
+                context.find("fieldset").show().find("a").attr("target", "_blank");
+            }
+        });
+
+        return false;
+    });
+
+    // 直接从已登记数据里选择
+    context.on("click", ".choose", function() {
+        var target = context.hsFind("@");
+        var input = $(this).closest(".form-group").find("input:text");
+        $(this).hsFork($(this).data("href"), target, input,
+            function (x, v, n) {
+            for(var k in v   ) {
+                var a  = v [k];
+                var t  = a [0];
+                x.attr("placeholder", t);
+                x.data("value" /**/ , k);
+                break;
+            }
+        } , function (x, v, n) {
+            if (x.data("value")) {
+              v[x.data("value")] = [x.attr("placeholder")];
+            }
+        });
+    });
+})(jQuery);
+</script>
