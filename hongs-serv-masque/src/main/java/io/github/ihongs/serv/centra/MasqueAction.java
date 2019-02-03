@@ -1,5 +1,6 @@
 package io.github.ihongs.serv.centra;
 
+import io.github.ihongs.Cnst;
 import io.github.ihongs.Core;
 import io.github.ihongs.HongsException;
 import io.github.ihongs.action.ActionHelper;
@@ -10,7 +11,9 @@ import io.github.ihongs.action.anno.Select;
 import io.github.ihongs.action.anno.Verify;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Model;
+import io.github.ihongs.normal.serv.Record;
 import io.github.ihongs.util.Digest;
+import io.github.ihongs.util.Synt;
 import java.util.Map;
 
 /**
@@ -178,6 +181,46 @@ public class MasqueAction {
         Map    req = helper.getRequestData();
         int    num = ett.delete(req);
         helper.reply("", num);
+    }
+
+    //** 口令 **/
+
+    @Action("token/create")
+    public void createToken(ActionHelper helper)
+    throws HongsException {
+        Model  ett = DB.getInstance("masque").getModel("site");
+        Map    req = helper.getRequestData();
+        Object sid = req.get("site_id");
+        Object mid = req.get("mine_id");
+        Object rid = req.get("room_id");
+
+        // 简单校验
+        if (sid == null || "".equals(sid)
+        ||  mid == null || "".equals(mid)
+        ||  rid == null || "".equals(rid)) {
+            helper.fault("site_id, mine_id and room_id required");
+            return;
+        }
+
+        // 查询秘钥
+        Map    row = ett.getOne(Synt.mapOf (
+                Cnst.RB_KEY, Synt.setOf( "sk" ),
+                Cnst.ID_KEY, req.get("site_id")
+            ));
+        String tok = (String) row.get("sk");
+        if (tok == null || "".equals(tok)) {
+            helper.fault("Site record is not exists");
+            return;
+        }
+        tok = Digest.md5(sid+"/"+mid+"/"+rid+"/"+tok);
+
+        // 生成临时 token 一天有效
+        String sec = Digest.md5(tok+"."+Core.newIdentity());
+        Record.put( "masque.token."+sec, tok, (3600 * 24) );
+
+        helper.reply(Synt.mapOf(
+            "token", sec
+        ));
     }
 
 }

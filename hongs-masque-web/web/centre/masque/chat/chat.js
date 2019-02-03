@@ -10,39 +10,66 @@ function HsChat( context, opts ) {
     var mineId  = hsGetValue(opts, "mineId");
     var roomId  = hsGetValue(opts, "roomId");
     var token   = hsGetValue(opts, "token" );
+    var proxy   = hsGetValue(opts, "proxy" );
+
+    if (! proxy) {
+        proxy   = location.origin+hsFixUri().replace(/\/$/, '');
+    }
 
     this.formBox = formBox;
     this.chatBox = chatBox;
-    this.mates = {};
+    this.proxy = proxy ;
     this.param = {
         site_id: siteId,
         mine_id: mineId,
         room_id: roomId,
         token  : token
     };
+    this.mates = {};
 
-    this.conn(siteId+"/"+mineId+"/"+roomId+"?token="+token);
+    var url = proxy.replace(/^\w+:/, location.protocol == "https:" ? "wss:" : "ws:")
+            + "/centre/masque/socket/"+siteId+"/"+mineId+"/"+roomId+"?token="+token;
+    this.conn(url);
 }
 HsChat.prototype = {
-    conn: function(uri) {
-        wsobj = new WebSocket(hsFixUri("centre/masque/socket/"+uri));
-        wsobj.onmessage = function(ev) {
-
-        };
+    conn: function(url) {
         var that = this;
-        function reconnect() {
-            hsNote(
-                "通讯已断开, 即将重连...", "warning",
-                 function () { that.conn( uri ); }, 3
+        function reco() {
+            $.hsView(
+                {
+                    title: "通讯已断开, 您是否要重新连接?",
+                    notes: "网络似乎出了点问题, 尝试多次但仍未成功, 您可以继续重新连接, 也可以选择关闭窗口.",
+                    glass: "alert-warning",
+                    alert: "static"
+                },
+                {
+                    label: "重新连接" ,
+                    glass: "btn-success",
+                    click: function () {
+                        that.conn(url);
+                    }
+                },
+                {
+                    label: "关闭" ,
+                    glass: "btn-danger" ,
+                    click: function () {
+                        window.close();
+                    }
+                }
             );
         }
-        wsobj.onclose = reconnect;
-        wsobj.onerror = reconnect;
+
+        wsobj = new WebSocket(url);
+        wsobj.onmessage = function(ev) {
+            console.log(ev);
+        };
+        wsobj.onclose = reco;
+        wsobj.onerror = reco;
     },
 
     getCurrRoom: function() {
         $.hsAjax( {
-            url : hsFixUri("centre/masque/room/search.act"),
+            url : this.proxy + "/centre/masque/room/search.act",
             data: this.param,
             success: function(rst) {
                 func(rst.info);
@@ -53,7 +80,7 @@ HsChat.prototype = {
     getMateInfo: function(func, mateId) {
         var req = { "mate_id" : mateId};
         $.hsAjax( {
-            url : hsFixUri("centre/masque/mate/search.act"),
+            url : this.proxy + "/centre/masque/mate/search.act",
             data: $.extend(req, this.param),
             success: function(rst) {
                 func(rst.info);
@@ -66,7 +93,7 @@ HsChat.prototype = {
                 ? {"ctime:lt" : ctime }
                 : {      "ab" :"fresh"};
         $.hsAjax( {
-            url : hsFixUri("centre/masque/chat/search.act"),
+            url : this.proxy + "centre/masque/chat/search.act",
             data: $.extend(req, this.param),
             success: function(rst) {
                 func(rst.list);

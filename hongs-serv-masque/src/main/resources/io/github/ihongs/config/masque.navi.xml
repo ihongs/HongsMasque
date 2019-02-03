@@ -1,22 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
     <menu text="站点管理" href="centra/masque/">
-        <role text="查阅数据" name="centra/masque/search">
+        <role text="查看站点" name="centra/masque/site/search">
             <action>centra/masque/site/search.act</action>
-            <action>centra/masque/room/search.act</action>
+        </role>
+        <role text="添加站点" name="centra/masque/site/create">
+            <depend>centra/masque/site/search</depend>
+            <action>centra/masque/site/create.act</action>
+        </role>
+        <role text="修改站点" name="centra/masque/site/update">
+            <depend>centra/masque/site/search</depend>
+            <action>centra/masque/site/update.act</action>
+        </role>
+        <role text="删除站点" name="centra/masque/site/delete">
+            <depend>centra/masque/site/search</depend>
+            <action>centra/masque/site/delete.act</action>
+        </role>
+        <role text="查看成员" name="centra/masque/mate/search">
+            <depend>centra/masque/site/search</depend>
             <action>centra/masque/mate/search.act</action>
         </role>
-        <role text="维护信息" name="centra/masque/update">
-            <depend>centra/masque/search</depend>
-            <action>centra/masque/site/create.act</action>
-            <action>centra/masque/site/update.act</action>
-            <action>centra/masque/site/delete.act</action>
-            <action>centra/masque/room/create.act</action>
-            <action>centra/masque/room/update.act</action>
-            <action>centra/masque/room/delete.act</action>
+        <role text="管理成员" name="centra/masque/mate/update">
+            <depend>centra/masque/mate/search</depend>
             <action>centra/masque/mate/create.act</action>
             <action>centra/masque/mate/update.act</action>
             <action>centra/masque/mate/delete.act</action>
+        </role>
+        <role text="查看频道" name="centra/masque/room/search">
+            <depend>centra/masque/site/search</depend>
+            <action>centra/masque/room/search.act</action>
+        </role>
+        <role text="管理频道" name="centra/masque/room/update">
+            <depend>centra/masque/room/search</depend>
+            <action>centra/masque/room/create.act</action>
+            <action>centra/masque/room/update.act</action>
+            <action>centra/masque/room/delete.act</action>
+        </role>
+        <role text="生成口令" name="centra/masque/room/update">
+            <depend>centra/masque/mate/search</depend>
+            <depend>centra/masque/room/search</depend>
+            <action>centra/masque/token/create.act</action>
         </role>
     </menu>
 </root>
