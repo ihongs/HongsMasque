@@ -3,12 +3,13 @@
     <head>
         <title>聊天</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <base href="../../../">
         <link rel="icon" type="image/x-icon" href="favicon.ico"/>
         <link rel="stylesheet" type="text/css" href="static/assets/css/bootstrap.min.css"/>
         <link rel="stylesheet" type="text/css" href="static/assets/css/hongscore.min.css"/>
-        <link rel="stylesheet" type="text/css" href="centra/base.css"/>
-        <link rel="stylesheet" type="text/css" href="centra/master/util.css"/>
+        <link rel="stylesheet" type="text/css" href="centre/base.css"/>
+        <link rel="stylesheet" type="text/css" href="centre/masque/chat/chat.css"/>
         <!--[if glt IE8.0]>
         <script type="text/javascript" src="static/addons/respond/respond.min.js"></script>
         <![endif]-->
@@ -20,38 +21,44 @@
         <script type="text/javascript" src="common/conf/default.js"></script>
         <script type="text/javascript" src="common/lang/default.js"></script>
         <script type="text/javascript" src="common/auth/centra.js"></script>
-        <style type="text/css">
-            .chatbox {
-                border: 1px solid #eee;
-                height: 600px;
-                overflow-y: scroll;
-            }
-        </style>
     </head>
     <body>
         <div id="notebox"></div>
         <div id="context">
             <div class="container">
-                <div class="col-sm-6" id="chatbox">
-                    <div class="chatbox" style=""></div>
-                    <form>
-                        <div class="input-group">
-                            <input type="text" class="form-control"/>
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-primary">发送</button>
-                            </span>
-                        </div>
-                    </form>
+                <div class="row">
+                    <div class="col-md-6" id="chatbox">
+                        <div  class="chatbox"></div>
+                        <form class="sendbox">
+                            <div class="input-group">
+                                <input type="text" name="note" class="form-control"/>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-thumbs-up"></span>
+                                    </button>
+                                    <button type="submit" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-picture"></span>
+                                    </button>
+                                </span>
+                            </div>
+                            <button type="submit" class="invisible"></button>
+                        </form>
+                    </div>
+                    <div class="col-md-6 hidden-sm hidden-xs">
+                        123123
+                    </div>
                 </div>
             </div>
         </div>
         <script type="text/javascript">
+            /*
             new HsChat($("#chatbox"), {
                 siteId: H$("@s"),
                 mineId: H$("@m"),
                 roomId: H$("@r"),
                 token : H$("@t")
             });
+            */
         </script>
     </body>
 </html>
