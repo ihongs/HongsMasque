@@ -1,0 +1,29 @@
+
+html ,
+body ,
+#context ,
+#chatbox ,
+.container ,
+.container>.row {
+    height : 100%;
+}
+
+#chatbox {
+    display: table;
+    height : 100%;
+    width  : 100%;
+}
+.sendbox {
+    display: table-row;
+    height : 66px;
+    width  : 100%;
+}
+.chatbox {
+    display: table-row;
+    overflow-y: scroll;
+    margin-left :-15px;
+    margin-right:-15px;
+}
+.sendbox>.input-group {
+    margin-top  : 15px;
+}

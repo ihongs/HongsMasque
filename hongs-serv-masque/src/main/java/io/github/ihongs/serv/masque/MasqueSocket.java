@@ -9,6 +9,7 @@ import io.github.ihongs.action.VerifyHelper;
 import io.github.ihongs.util.Data;
 import io.github.ihongs.util.thread.Async;
 import io.github.ihongs.util.verify.Wrongs;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -81,6 +82,14 @@ public class MasqueSocket {
         }
         catch (Exception|Error er) {
             CoreLogger.error ( er);
+
+            delSession(sess);
+            try {
+                sess.close();
+            }
+            catch (IOException ex) {
+                CoreLogger.error(er);
+            }
         }
     }
 

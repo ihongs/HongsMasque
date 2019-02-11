@@ -61,10 +61,19 @@ HsChat.prototype = {
 
         wsobj = new WebSocket(url);
         wsobj.onmessage = function(ev) {
-            console.log(ev);
+            that.recv(JSON.parse(ev.data));
         };
         wsobj.onclose = reco;
         wsobj.onerror = reco;
+    },
+
+    recv: function(rst) {
+        rst = hsResponse(rst);
+
+    },
+
+    send: function(req) {
+
     },
 
     getCurrRoom: function() {
