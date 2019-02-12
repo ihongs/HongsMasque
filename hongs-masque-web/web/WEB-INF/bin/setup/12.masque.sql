@@ -122,5 +122,12 @@ CREATE INDEX `IK_a_masque_mate_state` ON `a_masque_mate` (`state`);
 -- 管理员权限
 --
 
-INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/search');
-INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/update');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/site/search');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/site/create');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/site/update');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/site/delete');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/mate/search');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/mate/update');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/room/search');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/room/update');
+INSERT INTO `a_master_user_role` VALUES ('1','centra/masque/token/create');
