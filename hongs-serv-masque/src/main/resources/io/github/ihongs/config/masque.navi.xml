@@ -36,7 +36,7 @@
             <action>centra/masque/room/update.act</action>
             <action>centra/masque/room/delete.act</action>
         </role>
-        <role text="生成口令" name="centra/masque/room/update">
+        <role text="生成口令" name="centra/masque/token/create">
             <depend>centra/masque/mate/search</depend>
             <depend>centra/masque/room/search</depend>
             <action>centra/masque/token/create.act</action>
