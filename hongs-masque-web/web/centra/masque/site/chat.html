@@ -121,9 +121,11 @@
 
     // 直接从已登记数据里选择
     context.on("click", ".choose", function() {
-        var target = context.hsFind("@");
-        var input = $(this).closest(".form-group").find("input:text");
-        $(this).hsFork($(this).data("href"), target, input,
+        var result = $(this).closest(".form-group").find("input:text");
+        var target = context.hsFind ("@");
+        var href   = $(this).data("href");
+            href   = hsSetParam( href, "site_id", siteId );
+        $(this).hsFork(href , target , result ,
             function (x, v, n) {
             for(var k in v   ) {
                 var a  = v [k];
