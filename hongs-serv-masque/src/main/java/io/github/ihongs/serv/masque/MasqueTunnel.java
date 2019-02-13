@@ -57,7 +57,7 @@ public final class MasqueTunnel {
      * @return
      * @throws HongsException
      */
-    public static Async<Snd> getSender()
+    public static Async<Msg> getSender()
     throws HongsException {
         String name = Sender.class.getName();
         Sender inst = (Sender) Core.GLOBAL_CORE.got(name);
@@ -74,19 +74,22 @@ public final class MasqueTunnel {
     /**
      * 发送消息结构体
      */
-    public static class Snd {
+    public static class Msg {
 
         final  String  msg ;
         final  String  url ;
         final  Session ses ;
 
-        public Snd(String msg, String  url) {
+        public Msg(String msg, String  url) {
+            if ("".equals(url)) {
+                 url = null;
+            }
             this.msg = msg ;
             this.url = url ;
             this.ses = null;
         }
 
-        public Snd(String msg, Session ses) {
+        public Msg(String msg, Session ses) {
             this.msg = msg ;
             this.ses = ses ;
             this.url = null;
@@ -125,7 +128,7 @@ public final class MasqueTunnel {
      * 发送管道
      */
     private static class Sender
-    extends Async<Snd>
+    extends Async<Msg>
     implements Core.Singleton {
 
         private Sender(String name, int maxTasks, int maxServs)
@@ -134,7 +137,7 @@ public final class MasqueTunnel {
         }
 
         @Override
-        public void run(Snd info) {
+        public void run(Msg info) {
             try {
                 MasqueTunnel.send(info);
             }
@@ -205,7 +208,7 @@ public final class MasqueTunnel {
 
         ChatSet     chat = new ChatSet();
         Set<String> mids = new HashSet();
-        Async <Snd> sndr = getSender(  );
+        Async <Msg> sndr = getSender(  );
         Map<String, Set<Session> > sess ;
 
         // 保存消息
@@ -227,7 +230,7 @@ public final class MasqueTunnel {
                 mids.add(et.getKey());
                 Set<Session> ss = et.getValue();
                 for(Session  se : ss) {
-                    sndr.add(new MasqueTunnel.Snd(msg, se));
+                    sndr.add(new MasqueTunnel.Msg(msg, se));
                 }
             }
         }
@@ -240,7 +243,7 @@ public final class MasqueTunnel {
                 Set<Session> ss = sess.get(mid);
                 if ( null != ss /**/) {
                 for(Session  se : ss) {
-                    sndr.add(new MasqueTunnel.Snd(msg, se));
+                    sndr.add(new MasqueTunnel.Msg(msg, se));
                 }}
 
                 // 未读数量
@@ -271,7 +274,7 @@ public final class MasqueTunnel {
 //              mids.add(et.getKey());
                 Set<Session> ss = et.getValue();
                 for(Session  se : ss) {
-                    sndr.add(new MasqueTunnel.Snd(msg, se));
+                    sndr.add(new MasqueTunnel.Msg(msg, se));
                 }
             }
         }
@@ -280,12 +283,12 @@ public final class MasqueTunnel {
         else {
                 String ur = getNoteUrl (siteId);
                 if (ur != null) {
-                    sndr.add(new MasqueTunnel.Snd(msg, ur));
+                    sndr.add(new MasqueTunnel.Msg(msg, ur));
                 }
         }
     }
 
-    private static void send(Snd info) throws HongsException {
+    private static void send(Msg info) throws HongsException {
         if (info.ses != null) {
             info.ses
                 .getAsyncRemote (  )
@@ -335,9 +338,9 @@ public final class MasqueTunnel {
     private static     String  getNoteUrl(String siteId)
     throws HongsException {
         DB   db = DB.getInstance("masque");
-        Loop rs = db.with  ("site")
+        Loop rs = db.with  ("site"       )
                     .field ("note_url"   )
-                    .where ("id" , siteId)
+                    .where ("id = ?" , siteId)
                     .limit (1)
                     .select( );
         for(Map ro : rs) {
@@ -350,8 +353,8 @@ public final class MasqueTunnel {
     throws HongsException {
         Set  ms = new HashSet();
         DB   db = DB.getInstance("masque");
-        Loop rs = db.with  ("stat")
-                    .field ("mate_id")
+        Loop rs = db.with  ("stat"       )
+                    .field ("mate_id"    )
                     .where ("site_id=? AND room_id=? AND mate_id NOT IN (?)", siteId, roomId, mateIds)
                     .select( );
         for(Map ro : rs) {
