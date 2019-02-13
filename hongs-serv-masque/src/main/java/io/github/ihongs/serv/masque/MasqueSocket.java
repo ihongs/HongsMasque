@@ -42,7 +42,7 @@ public class MasqueSocket {
     @OnOpen
     public void onOpen(Session sess) {
         try (
-            SocketHelper hepr = SocketHelper.getInstance(sess);
+            SocketHelper hepr = SocketHelper.getInstance(sess, "open");
         ) {
             Map          prop = sess.getUserProperties();
             Map          data = new HashMap(/***/);
@@ -96,7 +96,7 @@ public class MasqueSocket {
     @OnMessage
     public void onMessage(Session sess, String msg) {
         try (
-            SocketHelper hepr = SocketHelper.getInstance(sess);
+            SocketHelper hepr = SocketHelper.getInstance(sess, "message");
         ) {
             Map          prop = sess.getUserProperties();
             Map          data = ( Map ) prop.get("data");
@@ -134,11 +134,12 @@ public class MasqueSocket {
     }
 
     @OnError
-    public void onError(Session sess, Throwable ta) {
+    public void onError(Session sess, Throwable ar) {
         try (
-            SocketHelper hepr = SocketHelper.getInstance(sess);
+            SocketHelper hepr = SocketHelper.getInstance(sess, "error");
         ) {
             delSession(sess);
+            CoreLogger.debug ( ar.getMessage() );
         }
         catch (Exception|Error er) {
             CoreLogger.error ( er);
@@ -148,7 +149,7 @@ public class MasqueSocket {
     @OnClose
     public void onClose(Session sess) {
         try (
-            SocketHelper hepr = SocketHelper.getInstance(sess);
+            SocketHelper hepr = SocketHelper.getInstance(sess, "close");
         ) {
             delSession(sess);
         }
