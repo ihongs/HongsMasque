@@ -25,52 +25,6 @@ CREATE INDEX `IK_a_masque_site_user` ON `a_masque_site` (`user_id`);
 CREATE INDEX `IK_a_masque_site_state` ON `a_masque_site` (`state`);
 
 --
--- 消息
---
-
-DROP TABLE IF EXISTS `a_masque_chat`;
-CREATE TABLE `a_masque_chat` (
-  `id` CHAR(16) NOT NULL,
-  `site_id` CHAR(16) NOT NULL,
-  `room_id` VARCHAR(32) NOT NULL,
-  `mate_id` VARCHAR(32) NOT NULL,
-  `kind` VARCHAR(10) DEFAULT 'text',
-  `note` TEXT DEFAULT NULL,
-  `data` TEXT DEFAULT NULL,
-  `ctime` BIGINT UNSIGNED DEFAULT NULL, /* 注意: 这里是毫秒 */
-  `state` TINYINT DEFAULT '1',
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
-);
-
-CREATE INDEX `IK_a_masque_chat_site` ON `a_masque_chat` (`site_id`);
-CREATE INDEX `IK_a_masque_chat_room` ON `a_masque_chat` (`room_id`);
-CREATE INDEX `IK_a_masque_chat_mate` ON `a_masque_chat` (`mate_id`);
-CREATE INDEX `IK_a_masque_chat_ctime` ON `a_masque_chat` (`ctime`);
-CREATE INDEX `IK_a_masque_chat_state` ON `a_masque_chat` (`state`);
-
---
--- 计数
---
-
-DROP TABLE IF EXISTS `a_masque_stat`;
-CREATE TABLE `a_masque_stat` (
-  `id` CHAR(16) NOT NULL,
-  `site_id` CHAR(16) NOT NULL,
-  `room_id` VARCHAR(32) NOT NULL,
-  `mate_id` VARCHAR(32) NOT NULL,
-  `fresh` UNSIGNED INTEGER(10) DEFAULT 0,
-  `mtime` UNSIGNED INTEGER(10) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
-);
-
-CREATE UNIQUE INDEX `UK_a_masque_stat_mate` ON `a_masque_stat` (`site_id`,`room_id`,`mate_id`);
-CREATE INDEX `IK_a_masque_stat_site` ON `a_masque_stat` (`site_id`);
-CREATE INDEX `IK_a_masque_stat_room` ON `a_masque_stat` (`room_id`);
-CREATE INDEX `IK_a_masque_stat_mate` ON `a_masque_stat` (`mate_id`);
-
---
 -- 房间
 --
 
@@ -117,6 +71,52 @@ CREATE UNIQUE INDEX `UK_a_masque_mate` ON `a_masque_mate` (`site_id`,`mate_id`);
 CREATE INDEX `IK_a_masque_mate_site` ON `a_masque_mate` (`site_id`);
 CREATE INDEX `IK_a_masque_mate_code` ON `a_masque_mate` (`mate_id`);
 CREATE INDEX `IK_a_masque_mate_state` ON `a_masque_mate` (`state`);
+
+--
+-- 消息
+--
+
+DROP TABLE IF EXISTS `a_masque_chat`;
+CREATE TABLE `a_masque_chat` (
+  `id` CHAR(16) NOT NULL,
+  `site_id` CHAR(16) NOT NULL,
+  `room_id` VARCHAR(32) NOT NULL,
+  `mate_id` VARCHAR(32) NOT NULL,
+  `kind` VARCHAR(10) DEFAULT 'text',
+  `note` TEXT DEFAULT NULL,
+  `data` TEXT DEFAULT NULL,
+  `ctime` UNSIGNED BIGINT DEFAULT NULL, /* 注意: 这里是毫秒 */
+  `state` TINYINT DEFAULT '1',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
+);
+
+CREATE INDEX `IK_a_masque_chat_site` ON `a_masque_chat` (`site_id`);
+CREATE INDEX `IK_a_masque_chat_room` ON `a_masque_chat` (`room_id`);
+CREATE INDEX `IK_a_masque_chat_mate` ON `a_masque_chat` (`mate_id`);
+CREATE INDEX `IK_a_masque_chat_ctime` ON `a_masque_chat` (`ctime`);
+CREATE INDEX `IK_a_masque_chat_state` ON `a_masque_chat` (`state`);
+
+--
+-- 计数
+--
+
+DROP TABLE IF EXISTS `a_masque_stat`;
+CREATE TABLE `a_masque_stat` (
+  `id` CHAR(16) NOT NULL,
+  `site_id` CHAR(16) NOT NULL,
+  `room_id` VARCHAR(32) NOT NULL,
+  `mate_id` VARCHAR(32) NOT NULL,
+  `mtime` UNSIGNED BIGINT DEFAULT NULL, /* 注意: 这里是毫秒 */
+  `fresh` UNSIGNED INTEGER(10) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX `UK_a_masque_stat_mate` ON `a_masque_stat` (`site_id`,`room_id`,`mate_id`);
+CREATE INDEX `IK_a_masque_stat_site` ON `a_masque_stat` (`site_id`);
+CREATE INDEX `IK_a_masque_stat_room` ON `a_masque_stat` (`room_id`);
+CREATE INDEX `IK_a_masque_stat_mate` ON `a_masque_stat` (`mate_id`);
 
 --
 -- 管理员权限

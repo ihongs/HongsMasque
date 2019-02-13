@@ -15,9 +15,11 @@ import io.github.ihongs.util.Data;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Remote;
 import io.github.ihongs.util.Synt;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * 常规消息接口
@@ -65,8 +67,9 @@ public class MasqueAction {
         form = "auth"
     )
     public void searchStat(ActionHelper helper) throws HongsException {
+        Model  mod = DB.getInstance("masque").getModel("stat");
         Table  sta = DB.getInstance("masque").getTable("stat");
-        Table  cha = DB.getInstance("masque").getTable("stat");
+        Table  cha = DB.getInstance("masque").getTable("chat");
         Map    req = helper.getRequestData( );
 
         String sid = (String) req.get("site_id");
@@ -75,49 +78,80 @@ public class MasqueAction {
 
         String sql;
         String msg; // 最近的一条消息
+        String mat; // 最近发消息的人
         long   tim; // 最近发送的时间
         int    num; // 未读消息的数量
         Map    row;
 
         /**
-         * 参数无明确的 room_id,
-         * 统计全部未读消息数量.
+         * room_id 为:
+         * '.' 返回分页状态列表数据,
+         * '!' 统计全部未读消息数量.
          */
-        if (rid != null && !"".equals(rid) && !"!".equals(rid) && !".".equals(rid)) {
+        if (".".equals(rid)) {
+            Map rsq = Synt.mapOf(
+                "site_id", sid,
+                "mate_id", mid
+            );
+
+            Set rb =  Synt.toTerms(req.get(Cnst.RB_KEY));
+            if (rb == null) {
+                rb =  Synt.setOf("room_id", "fresh", "mtime", "last");
+                rsq.put (Cnst.RB_KEY , rb);
+            }
+
+            Set ob =  Synt.toTerms(req.get(Cnst.OB_KEY));
+            if (ob == null) {
+                ob =  Synt.setOf("-mtime");
+                rsq.put (Cnst.OB_KEY , ob);
+            }
+
+            Map rsp = mod.search(rsq);
+
+            // TODO: 追加最后消息
+
+            helper.reply(rsp);
+            return;
+        } else
+        if ("!".equals(rid)) {
+            sql = "SELECT SUM(s.fresh) AS fresh"
+                + " FROM `"+sta.tableName+"` AS s"
+                + " WHERE s.site_id=? AND s.mate_id=?";
+            row = sta.db.fetchOne(sql, sid, mid /**/);
+            num = Synt.declare(row.get("fresh"),  0 );
+
+            sql = "SELECT c.ctime,c.note,c.mate_id"
+                + " FROM `"+cha.tableName+"` AS c"
+                + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
+                + " WHERE c.site_id=? AND s.mate_id=?"
+                + " ORDER BY c.ctime";
+            row = cha.db.fetchOne(sql, sid, mid /**/);
+            tim = Synt.declare(row.get("ctime"),  0 );
+            msg = Synt.declare(row.get("note" ),  "");
+            mat = Synt.declare(row.get("mate_id"),"");
+        } else {
             sql = "SELECT SUM(s.fresh) AS fresh"
                 + " FROM `"+sta.tableName+"` AS s"
                 + " WHERE s.site_id=? AND s.mate_id=? AND s.room_id=?";
             row = sta.db.fetchOne(sql, sid, mid, rid);
-            num = Synt.declare( row.get("fresh"), 0 );
+            num = Synt.declare(row.get("fresh"),  0 );
 
-            sql = "SELECT c.ctime,c.note"
+            sql = "SELECT c.ctime,c.note,c.mate_id"
                 + " FROM `"+cha.tableName+"` AS c"
                 + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
                 + " WHERE c.site_id=? AND s.mate_id=? AND c.room_id=?"
                 + " ORDER BY c.ctime";
             row = cha.db.fetchOne(sql, sid, mid, rid);
-            tim = Synt.declare( row.get("ctime"), 0 );
-            msg = Synt.declare( row.get("note"), "" );
-        } else {
-            sql = "SELECT SUM(s.fresh) AS fresh"
-                + " FROM `"+sta.tableName+"` AS s"
-                + " WHERE s.site_id=? AND s.mate_id=?";
-            row = sta.db.fetchOne(sql, sid, mid /**/);
-            num = Synt.declare( row.get("fresh"), 0 );
-
-            sql = "SELECT c.ctime,c.note FROM `"+cha.tableName+"` AS c"
-                + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
-                + " WHERE c.site_id=? AND s.mate_id=?"
-                + " ORDER BY c.ctime";
-            row = cha.db.fetchOne(sql, sid, mid /**/);
-            tim = Synt.declare( row.get("ctime"), 0 );
-            msg = Synt.declare( row.get("note"), "" );
+            tim = Synt.declare(row.get("ctime"),  0 );
+            msg = Synt.declare(row.get("note" ),  "");
+            mat = Synt.declare(row.get("mate_id"),"");
         }
 
         helper.reply("", Synt.mapOf(
             "fresh", num,
-            "ctime", tim,
-            "note" , msg
+            "mtime", tim,
+            "last_note" , msg,
+            "last_mate" , mat
         ));
     }
 
@@ -202,11 +236,21 @@ public class MasqueAction {
         }
 
         try {
-            mod.add(req);
-            helper.reply("", 1);
+            Map row = mod.table.fetchCase()
+                .filter("site_id = ?", req.get("site_id") )
+                .filter("room_id = ?", req.get("room_id") )
+                .select("id")
+                .getOne();
+            if (row != null && ! row.isEmpty(/**/)) {
+                String id = (String) row.get("id");
+                mod.put(id, req);
+            } else {
+                mod.add(/**/req);
+            }
+            helper.reply("", 1 );
         } catch ( HongsException e) {
         if (e.getErrno() == 0x104e) {
-            helper.reply("", 0);
+            helper.reply("", 0 );
         } else {
             helper.fault(e.getLocalizedMessage());
         }}
@@ -219,7 +263,7 @@ public class MasqueAction {
     )
     public void searchMate(ActionHelper helper) throws HongsException {
         Map    req = helper.getRequestData( );
-        Set    ids = Synt.asSet(req.get("room_id"));
+        Set    ids = Synt.asSet(req.get("mate_id"));
         String sid = ( String ) req.get("site_id");
 
         /**
@@ -255,11 +299,21 @@ public class MasqueAction {
         }
 
         try {
-            mod.add(req);
-            helper.reply("", 1);
+            Map row = mod.table.fetchCase()
+                .filter("site_id = ?", req.get("site_id") )
+                .filter("mate_id = ?", req.get("mate_id") )
+                .select("id")
+                .getOne();
+            if (row != null && ! row.isEmpty(/**/)) {
+                String id = (String) row.get("id");
+                mod.put(id, req);
+            } else {
+                mod.add(/**/req);
+            }
+            helper.reply("", 1 );
         } catch ( HongsException e) {
         if (e.getErrno() == 0x104e) {
-            helper.reply("", 0);
+            helper.reply("", 0 );
         } else {
             helper.fault(e.getLocalizedMessage());
         }}
@@ -322,17 +376,33 @@ public class MasqueAction {
      */
     private String getForeData(String tab, String sid, Set ids) throws HongsException {
         Map row = DB.getInstance("masque")
-            .with ("site")
-            .field(tab+"_url")
-            .where("id=?",sid)
-            .getOne();
+            .with  ("site")
+            .field (tab + "_url")
+            .where ("id=?", sid )
+            .getOne(  );
         if (row.isEmpty()) {
             return null;
         }
         String url = (String) row.get(tab + "_url");
 
+        // 从数据库获取
+        if (url == null || url.isEmpty()) {
+            List list = DB.getInstance("masque")
+                .with  (tab)
+                .where (tab +"_id IN (?)", ids )
+                .getAll(   );
+            // 补全头像链接
+            for (Map info : ( List<Map> ) list ) {
+                info.put("icon", fixHostName(info.get("icon")));
+            }
+            return Data.toString(Synt.mapOf(
+                "ok"  , true,
+                "list", list
+            ));
+        }
+
         // 调用内部对象
-        if (url.startsWith("class://")) {
+        if (url.startsWith( "class://" )) {
             try {
                 Object obj = Core.getInstance(url.substring(8));
                 Object rst = ( (Function) obj).apply(Synt.mapOf(
@@ -351,5 +421,30 @@ public class MasqueAction {
             tab+"_ids[]" , ids
         ));
     }
+
+    /**
+     * 补全相对路径的域名和前缀
+     * @param val
+     * @return
+     */
+    private String fixHostName(Object val) {
+        String url = (String) val;
+        if (url == null || url.isEmpty( )) {
+            return url;
+        }
+        if (PRE.matcher(url).find()) {
+            return url;
+        } else
+        if (url.startsWith ( "/" ) ) {
+            return Core.SITE_HREF
+                 + url;
+        } else {
+            return Core.SITE_HREF
+                 + Core.BASE_HREF
+                 + "/"
+                 + url;
+        }
+    }
+    private static final Pattern PRE = Pattern.compile("^(\\w+:)?//");
 
 }
