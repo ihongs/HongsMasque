@@ -113,7 +113,7 @@ HsChat.prototype = {
             success: function(rst) {
                 rst = hsResponse(rst);
                 if (rst.ok) {
-                    func(rst.info);
+                    func(rst.list[0] || {});
                 }
             }
         });
@@ -127,7 +127,7 @@ HsChat.prototype = {
             success: function(rst) {
                 rst = hsResponse(rst);
                 if (rst.ok) {
-                    func(rst.info);
+                    func(rst.list[0] || {});
                 }
             }
         });
@@ -143,7 +143,7 @@ HsChat.prototype = {
             success: function(rst) {
                 rst = hsResponse(rst);
                 if (rst.ok) {
-                    func(rst.list);
+                    func(rst.list || [  ] );
                 }
             }
         });
