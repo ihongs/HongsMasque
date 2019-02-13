@@ -94,17 +94,17 @@ public class MasqueAction {
                 "mate_id", mid
             );
 
-            Set rb =  Synt.toTerms(req.get(Cnst.RB_KEY));
+            Set rb  = Synt.toTerms(req.get(Cnst.RB_KEY));
             if (rb == null) {
-                rb =  Synt.setOf("room_id", "fresh", "mtime", "last");
-                rsq.put (Cnst.RB_KEY , rb);
+                rb  = Synt.setOf("room_id", "fresh", "mtime", "last");
             }
+            rsq.put(Cnst.RB_KEY , rb);
 
-            Set ob =  Synt.toTerms(req.get(Cnst.OB_KEY));
+            Set ob  = Synt.toTerms(req.get(Cnst.OB_KEY));
             if (ob == null) {
-                ob =  Synt.setOf("-mtime");
-                rsq.put (Cnst.OB_KEY , ob);
+                ob  = Synt.setOf("-mtime");
             }
+            rsq.put(Cnst.OB_KEY , ob);
 
             Map rsp = mod.search(rsq);
 
