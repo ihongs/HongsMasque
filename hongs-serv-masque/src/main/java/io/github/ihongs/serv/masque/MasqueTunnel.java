@@ -162,6 +162,7 @@ public final class MasqueTunnel {
         public ChatSet() throws HongsException {
             now = System.currentTimeMillis();
             db  = DB.getInstance( "masque" );
+                  db.open();
             ctb = db.getTable("chat");
             stb = db.getTable("stat");
             upd = db.prepareStatement("UPDATE `"+stb.tableName+"` SET `fresh`=`fresh`+1,`mtime`=? WHERE `site_id`=? AND `room_id`=? AND `mate_id`=?");
