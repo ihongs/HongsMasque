@@ -13,16 +13,28 @@ body ,
     height : 100%;
     width  : 100%;
 }
-.sendbox {
+.chatrow {
     display: table-row;
-    height : 66px;
+    height : 100%;
     width  : 100%;
 }
+.sendrow {
+    width : 100%;
+    position: fixed;
+    bottom: 0;
+}
 .chatbox {
-    display: table-row;
+    height : 100%;
+    width  : 100%;
     overflow-y: scroll;
+    padding-top : 15px;
     margin-left :-15px;
     margin-right:-15px;
+}
+.sendbox {
+    display: table-cell;
+    height : 100%;
+    width  : 100%;
 }
 .sendbox>.input-group {
     margin-top  : 15px;
