@@ -25,12 +25,12 @@
     // 文件上传处理
     if ("image".equals(tp)) {
         vh.addRule("file", new Thumb().config(Synt.mapOf(
-            "thumb-size", "_sm:300*600",
-            "extn", "jpeg,jpg,png,gif,bmp",
+            "href", "${BASE_HREF}/center/masque/file/"+si+"/"+ri+"/image",
             "path", "${BASE_PATH}/centre/masque/file/"+si+"/"+ri+"/image",
-            "href", "${BASE_HREF}/center/masque/file/"+si+"/"+ri+"/image"
+            "extn", "jpeg,jpg,png,gif,bmp" ,
+            "thumb-size", "_sm:300*600"
         )));
-        ah.reply(vh.verify( rd, true, true ));
+        ah.reply(vh.verify(rd, true, true));
     } else {
         throw new HongsException(0x1100, "Unsupported type!");
     }
