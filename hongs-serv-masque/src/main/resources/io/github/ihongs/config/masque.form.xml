@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
+    <form name="auth">
+        <field name="site_id" required="yes"></field>
+        <field name="mine_id" required="yes"></field>
+        <field name="room_id" required="yes"></field>
+        <field name="token" rule="MasqueChatAuth" required="yes"></field>
+    </form>
     <form name="site">
         <field name="id" type="string"></field>
         <field name="sk" type="string"></field>
@@ -46,12 +52,6 @@
             <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
             <param name="down-remote">yes</param>
         </field>
-    </form>
-    <form name="auth">
-        <field name="site_id" required="yes"></field>
-        <field name="mine_id" required="yes"></field>
-        <field name="room_id" required="yes"></field>
-        <field name="token" rule="MasqueChatAuth" required="yes"></field>
     </form>
     <form name="chat">
         <field name="id" type="string"></field>
