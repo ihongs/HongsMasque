@@ -15,8 +15,8 @@ CREATE TABLE `a_masque_site` (
   `room_url` VARCHAR(200) DEFAULT NULL, /* 获取 room 信息 */
   `mate_url` VARCHAR(200) DEFAULT NULL, /* 获取 mate 信息 */
   `note_url` VARCHAR(200) DEFAULT NULL, /* 自定义离线通知 */
-  `ctime` UNSIGNED INTEGER(10) DEFAULT NULL,
-  `mtime` UNSIGNED INTEGER(10) DEFAULT NULL,
+  `ctime` INTEGER(10) DEFAULT NULL,
+  `mtime` INTEGER(10) DEFAULT NULL,
   `state` TINYINT DEFAULT '1',
   PRIMARY KEY (`id`)
 );
@@ -36,8 +36,8 @@ CREATE TABLE `a_masque_room` (
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
   `icon` VARCHAR(100) DEFAULT NULL,
-  `ctime` UNSIGNED INTEGER(10) DEFAULT NULL,
-  `mtime` UNSIGNED INTEGER(10) DEFAULT NULL,
+  `ctime` INTEGER(10) DEFAULT NULL,
+  `mtime` INTEGER(10) DEFAULT NULL,
   `state` TINYINT DEFAULT '1',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
@@ -60,8 +60,8 @@ CREATE TABLE `a_masque_mate` (
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
   `icon` VARCHAR(100) DEFAULT NULL,
-  `ctime` UNSIGNED INTEGER(10) DEFAULT NULL,
-  `mtime` UNSIGNED INTEGER(10) DEFAULT NULL,
+  `ctime` INTEGER(10) DEFAULT NULL,
+  `mtime` INTEGER(10) DEFAULT NULL,
   `state` TINYINT DEFAULT '1',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
@@ -85,7 +85,7 @@ CREATE TABLE `a_masque_chat` (
   `kind` VARCHAR(10) DEFAULT 'text',
   `note` TEXT DEFAULT NULL,
   `data` TEXT DEFAULT NULL,
-  `ctime` UNSIGNED BIGINT DEFAULT NULL, /* 注意: 这里是毫秒 */
+  `ctime`  BIGINT DEFAULT NULL, /* 注意: 这里是毫秒 */
   `state` TINYINT DEFAULT '1',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
@@ -107,8 +107,8 @@ CREATE TABLE `a_masque_stat` (
   `site_id` CHAR(16) NOT NULL,
   `room_id` VARCHAR(32) NOT NULL,
   `mate_id` VARCHAR(32) NOT NULL,
-  `mtime` UNSIGNED BIGINT DEFAULT NULL, /* 注意: 这里是毫秒 */
-  `fresh` UNSIGNED INTEGER(10) DEFAULT 0,
+  `mtime`  BIGINT DEFAULT NULL, /* 注意: 这里是毫秒 */
+  `fresh` INTEGER DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`site_id`) REFERENCES `a_masque_site` (`id`) ON DELETE CASCADE
 );
