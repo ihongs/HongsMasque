@@ -4,7 +4,7 @@ function HsChat( context, opts ) {
     context.data("HsChat", this);
     context.addClass( "HsChat" );
 
-    var formBox = context.find( "form"   );
+    var sendBox = context.find(".sendbox");
     var chatBox = context.find(".chatbox");
     var siteId  = hsGetValue(opts, "siteId");
     var mineId  = hsGetValue(opts, "mineId");
@@ -12,7 +12,7 @@ function HsChat( context, opts ) {
     var token   = hsGetValue(opts, "token" );
     var proxy   = hsGetValue(opts, "proxy" );
 
-    this.formBox = formBox;
+    this.sendBox = sendBox;
     this.chatBox = chatBox;
     this.proxy = proxy || hsFixUri("centre/masque");
     this.param = {
@@ -29,7 +29,7 @@ function HsChat( context, opts ) {
 HsChat.prototype = {
     init: function() {
         var that = this;
-        this.formBox.on("submit", function(ev) {
+        this.sendBox.on("submit", function(ev) {
             that.send(hsSerialDic(this));
             ev.stopPropagation();
             ev.preventDefault ();
@@ -150,30 +150,48 @@ HsChat.prototype = {
     },
 
     addChatLine: function(info) {
-        var chatItem = $('<div class="chat-item"></div>').appendTo(this.chatBox);
-        var chatHead = $('<div class="chat-head"></div>').appendTo(chatHead);
-        var chatText = $('<div class="chat-text"></div>').appendTo(chatItem);
-        var mateInfo = this.mates[info.mate_id];
+        var chatItem = $(
+          '<div class="chat-item">'
+        + '<div class="chat-line">'
+        + '<div class="chat-head">'
+        + '<div class="chat-head-icon"></div>'
+        + '</div>'
+        + '<div class="chat-body">'
+        + '<div class="chat-body-name"></div>'
+        + '<div class="chat-body-text"></div>'
+        + '</div>'
+        + '</div>'
+        + '</div>'
+        ).appendTo(this.chatBox);
+        var chatLine = chatItem.children();
+        var chatHead = chatItem.find(".chat-head");
+        var chatIcon = chatItem.find(".chat-head-icon");
+        var chatName = chatItem.find(".chat-body-name");
+        var chatText = chatItem.find(".chat-body-text");
+        var mateInfo = this.mates [ info.mate_id ];
         var mateId   = info.mate_id;
         var that     = this;
+
+        if (mateId === this.param.mine_id) {
+            chatItem.addClass("chat-mine");
+            chatLine.append  ( chatHead  );
+        } 
 
         switch (info.kind) {
             default:
                 chatText.text( info.note );
         }
 
-        if (mateId === this.param.mine_id) {
-            chatItem.addClass("chat-mine");
-        }
-
         if (mateInfo) {
-            chatHead.css("background-url", mateInfo.head);
+            chatName.text( mateInfo.name );
+            chatIcon.css ("background-url", mateInfo.head);
             return;
         }
 
         this.getMateInfo(function(mateInfo) {
             that.mates [mateId] = mateInfo;
-            chatHead.css("background-url", mateInfo.head);
+            chatName.text( mateInfo.name );
+            chatIcon.css ("background-url", mateInfo.head);
         }, mateId);
     }
 };

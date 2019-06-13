@@ -1,41 +1,56 @@
 
-html ,
-body ,
-#context ,
-#chatbox ,
-.container ,
-.container>.row {
-    height : 100%;
+#chatbox .chatrow {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 1em;
+    margin-top   : 1em;
+    overflow-y   : auto;
+    background   : #f8f8f8;
+    height : 500px;
+    padding: 8px;
 }
 
-#chatbox {
+#chatbox .chat-item {
     display: table;
-    height : 100%;
-    width  : 100%;
-}
-.chatrow {
-    display: table-row;
-    height : 100%;
-    width  : 100%;
-}
-.sendrow {
     width : 100%;
-    position: fixed;
-    bottom: 0;
 }
-.chatbox {
-    height : 100%;
-    width  : 100%;
-    overflow-y: scroll;
-    padding-top : 15px;
-    margin-left :-15px;
-    margin-right:-15px;
+#chatbox .chat-line {
+    display: table-row;
 }
-.sendbox {
+#chatbox .chat-body {
     display: table-cell;
-    height : 100%;
-    width  : 100%;
+    vertical-align: top;
+    padding: 6px;
 }
-.sendbox>.input-group {
-    margin-top  : 15px;
+#chatbox .chat-head {
+    display: table-cell;
+    vertical-align: top;
+    width : 30px;
+}
+#chatbox .chat-head-icon {
+    width : 30px;
+    height: 30px;
+    background: url(../../../static/assets/img/head_icon.jpg) top center no-repeat;
+    background-size: 100% 100%;
+}
+#chatbox .chat-body-name ,
+#chatbox .chat-body-text {
+    font-size  : 14px;
+    line-height: 20px;
+}
+#chatbox .chat-body-name {
+    background: #ddd;
+    color: #888;
+}
+#chatbox .chat-body-text {
+    background: #fff;
+    color: #222;
+}
+#chatbox .chat-body-name:empty ,
+#chatbox .chat-body-text:empty {
+    display: none;
+}
+#chatbox .chat-mine .chat-body-name ,
+#chatbox .chat-mine .chat-body-text {
+    text-align: right;
 }
