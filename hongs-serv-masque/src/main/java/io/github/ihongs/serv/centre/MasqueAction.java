@@ -55,7 +55,7 @@ public class MasqueAction {
             String sql = "UPDATE `"+sta.tableName+"` SET `fresh`=0,`mtime`=? WHERE `fresh`!=0 AND site_id=? AND room_id=? AND mate_id=?";
             String sid = (String) req.get("site_id");
             String rid = (String) req.get("room_id");
-            String mid = (String) req.get("mate_id");
+            String mid = (String) req.get("mine_id"); // 当前用户
             long   now = Core.ACTION_TIME.get()/1000;
             sta.db.updates (sql, now, sid, rid, mid);
         }
@@ -175,6 +175,8 @@ public class MasqueAction {
                   .translate( "core.masque.wrong.level" ) );
             return;
         }
+
+        req.put("mate_id", req.get("mine_id")); // 当前用户
 
         /**
          * 0x104e 表示 SQL 错误,
