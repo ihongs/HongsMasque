@@ -237,22 +237,22 @@ public final class MasqueTunnel {
 
         // 发送通知
         sess = Dict.getValue(MasqueSocket.SESSIONS, Map.class, siteId, "!");
-        if (sess != null) {
-            for(String mid : getMateIds(siteId, roomId, mids)) {
-                mids.remove(mid);
+        for(String mid : getMateIds (siteId, roomId, mids)) {
+            if (sess != null) {
                 Set<Session> ss = sess.get(mid);
-                if ( null != ss /**/) {
+            if (  ss != null) {
                 for(Session  se : ss) {
                     sndr.add(new MasqueTunnel.Msg(msg, se));
-                }}
+                }
+                mids.remove(mid);
+            }}
 
-                // 未读数量
-                try {
-                    chat.fresh(mid);
-                }
-                catch (HongsException ex) {
-                    CoreLogger.error (ex);
-                }
+            // 未读数量
+            try {
+                chat.fresh (mid);
+            }
+            catch (HongsException ex) {
+                CoreLogger.error (ex);
             }
         }
 
