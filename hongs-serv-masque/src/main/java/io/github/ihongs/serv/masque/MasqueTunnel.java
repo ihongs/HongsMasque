@@ -237,10 +237,11 @@ public final class MasqueTunnel {
 
         // 发送通知
         sess = Dict.getValue(MasqueSocket.SESSIONS, Map.class, siteId, "!");
-        for(String mid : getMateIds (siteId, roomId, mids)) {
-            if (sess != null) {
+        mids = getMateIds(siteId, roomId, mids);
+        for(String mid : mids) {
+            if (sess != null ) {
                 Set<Session> ss = sess.get(mid);
-            if (  ss != null) {
+            if (  ss != null ) {
                 for(Session  se : ss) {
                     sndr.add(new MasqueTunnel.Msg(msg, se));
                 }
@@ -281,8 +282,8 @@ public final class MasqueTunnel {
 
         // HTTP回调
         else {
-                String ur = getNoteUrl (siteId);
-                if (ur != null) {
+                String ur  = getNoteUrl(siteId);
+                if (   ur != null   ) {
                     sndr.add(new MasqueTunnel.Msg(msg, ur));
                 }
         }
