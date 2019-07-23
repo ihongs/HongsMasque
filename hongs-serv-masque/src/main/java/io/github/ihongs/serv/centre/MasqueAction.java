@@ -15,6 +15,9 @@ import io.github.ihongs.util.Data;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Remote;
 import io.github.ihongs.util.Synt;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,7 +99,7 @@ public class MasqueAction {
 
             Set rb  = Synt.toTerms(req.get(Cnst.RB_KEY));
             if (rb == null) {
-                rb  = Synt.setOf("room_id", "fresh", "mtime", "last");
+                rb  = Synt.setOf("room_id", "fresh", "mtime", "note");
             }
             rsq.put(Cnst.RB_KEY , rb);
 
@@ -108,7 +111,11 @@ public class MasqueAction {
 
             Map rsp = mod.search(rsq);
 
-            // TODO: 追加最后消息
+            // 追加最新消息
+            if (rb.contains(  "note"     )
+            &&  rb.contains(  "room_id" )) {
+                addLastNote(sid, mid, rsp);
+            }
 
             helper.reply(rsp);
             return;
@@ -366,6 +373,43 @@ public class MasqueAction {
         Record.del( "masque.token."+tok );
 
         helper.reply("");
+    }
+
+    /**
+     * 追加最新消息
+     * @param sid
+     * @param mid
+     * @param rsp
+     * @throws HongsException
+     */
+    private  void  addLastNote(String sid, String mid, Map rsp) throws HongsException {
+        List <Map> ls = (List) rsp.get("list");
+        if  ( ls == null || ls.isEmpty( ) )  {
+            return;
+        }
+
+        Table tb = DB.getInstance("masque")
+                     .getTable   ( "chat" );
+        try (
+            PreparedStatement ps = tb.db.prepareStatement(
+                "SELECT `note` FROM `" + tb.tableName + "`"
+              + " WHERE `site_id` = ?"
+              +   " AND `mate_id` = ?"
+              +   " AND `room_id` = ?"
+              + " ORDER BY `ctime` DESC"
+              + " LIMIT 1"    );
+        )   {
+            ps.setObject(1,sid);
+            ps.setObject(2,mid);
+            for ( Map ra : ls ) {
+                ps.setString(3, (String)ra.get("room_id"));
+                ResultSet rs = ps.executeQuery();
+                ra.put("note", rs.getString (1));
+            }
+        }
+        catch (SQLException ex) {
+            throw new HongsException.Common (ex);
+        }
     }
 
     /**
