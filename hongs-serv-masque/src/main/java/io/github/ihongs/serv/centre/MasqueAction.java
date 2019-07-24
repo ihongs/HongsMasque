@@ -7,6 +7,7 @@ import io.github.ihongs.HongsException;
 import io.github.ihongs.action.ActionHelper;
 import io.github.ihongs.action.anno.Action;
 import io.github.ihongs.action.anno.Verify;
+import io.github.ihongs.action.anno.CommitSuccess;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Model;
 import io.github.ihongs.db.Table;
@@ -18,6 +19,7 @@ import io.github.ihongs.util.Synt;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,21 +72,10 @@ public class MasqueAction {
         form = "auth"
     )
     public void searchStat(ActionHelper helper) throws HongsException {
-        Model  mod = DB.getInstance("masque").getModel("stat");
-        Table  sta = DB.getInstance("masque").getTable("stat");
-        Table  cha = DB.getInstance("masque").getTable("chat");
         Map    req = helper.getRequestData( );
-
         String sid = (String) req.get("site_id");
         String rid = (String) req.get("room_id");
         String mid = (String) req.get("mine_id"); // 仅能获取当前用户的状态
-
-        String sql;
-        String msg; // 最近的一条消息
-        String mat; // 最近发消息的人
-        long   tim; // 最近发送的时间
-        int    num; // 未读消息的数量
-        Map    row;
 
         /**
          * room_id 为:
@@ -92,74 +83,111 @@ public class MasqueAction {
          * '!' 统计全部未读消息数量.
          */
         if (".".equals(rid)) {
-            Map rsq = Synt.mapOf(
-                "site_id", sid,
-                "mate_id", mid
-            );
-
-            Set rb  = Synt.toTerms(req.get(Cnst.RB_KEY));
-            if (rb == null) {
-                rb  = Synt.setOf("room_id", "fresh", "mtime", "note");
-            }
-            rsq.put(Cnst.RB_KEY , rb);
+            req = new HashMap (req);
+            req.put("mate_id", mid);
+            req.remove( "room_id" );
+            req.remove(      "id" );
 
             Set ob  = Synt.toTerms(req.get(Cnst.OB_KEY));
-            if (ob == null) {
+            if (ob == null || ob.isEmpty()) {
                 ob  = Synt.setOf("-mtime");
+                req.put( Cnst.OB_KEY, ob );
             }
-            rsq.put(Cnst.OB_KEY , ob);
 
-            Map rsp = mod.search(rsq);
+            Set rb  = Synt.toTerms(req.get(Cnst.RB_KEY));
+            if (rb == null || ob.isEmpty()) {
+                rb  = Synt.setOf( "fresh" , "mtime" , "last_chat");
+                req.put( Cnst.RB_KEY, rb );
+            }
+            rb.add("room_id");
+
+            // 获取状态列表
+            Model  mod = DB.getInstance("masque").getModel("stat");
+            Map    rsp = mod.search( req );
 
             // 追加最新消息
-            if (rb.contains(  "note"     )
-            &&  rb.contains(  "room_id" )) {
-                addLastNote(sid, mid, rsp);
+            if (rb.contains("last_chat") ) {
+                addLastChat(mid, sid, rsp);
             }
 
             helper.reply(rsp);
             return;
-        } else
-        if ("!".equals(rid)) {
-            sql = "SELECT SUM(s.fresh) AS fresh"
-                + " FROM `"+sta.tableName+"` AS s"
-                + " WHERE s.site_id=? AND s.mate_id=?";
-            row = sta.db.fetchOne(sql, sid, mid /**/);
-            num = Synt.declare(row.get("fresh"),  0 );
-
-            sql = "SELECT c.ctime,c.note,c.mate_id"
-                + " FROM `"+cha.tableName+"` AS c"
-                + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
-                + " WHERE c.site_id=? AND s.mate_id=?"
-                + " ORDER BY c.ctime";
-            row = cha.db.fetchOne(sql, sid, mid /**/);
-            tim = Synt.declare(row.get("ctime"),  0 );
-            msg = Synt.declare(row.get("note" ),  "");
-            mat = Synt.declare(row.get("mate_id"),"");
-        } else {
-            sql = "SELECT SUM(s.fresh) AS fresh"
-                + " FROM `"+sta.tableName+"` AS s"
-                + " WHERE s.site_id=? AND s.mate_id=? AND s.room_id=?";
-            row = sta.db.fetchOne(sql, sid, mid, rid);
-            num = Synt.declare(row.get("fresh"),  0 );
-
-            sql = "SELECT c.ctime,c.note,c.mate_id"
-                + " FROM `"+cha.tableName+"` AS c"
-                + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
-                + " WHERE c.site_id=? AND s.mate_id=? AND c.room_id=?"
-                + " ORDER BY c.ctime";
-            row = cha.db.fetchOne(sql, sid, mid, rid);
-            tim = Synt.declare(row.get("ctime"),  0 );
-            msg = Synt.declare(row.get("note" ),  "");
-            mat = Synt.declare(row.get("mate_id"),"");
         }
 
-        helper.reply("", Synt.mapOf(
-            "fresh", num,
-            "mtime", tim,
-            "last_note" , msg,
-            "last_mate" , mat
-        ));
+        Set rb  = Synt.toTerms(req.get(Cnst.RB_KEY));
+        if (rb == null || rb.isEmpty()) {
+            rb  = Synt.setOf( "fresh" , "mtime" , "last_chat");
+        }
+
+        Table  sta = DB.getInstance("masque").getTable("stat");
+        Table  cha = DB.getInstance("masque").getTable("chat");
+        String sql;
+        Map    row;
+        Map    rst;
+
+        if ("!".equals(rid)) {
+            if (rb.contains("mtime" )
+            ||  rb.contains("fresh")) {
+                sql = "SELECT MAX(s.mtime) AS mtime, SUM(s.fresh) AS fresh"
+                    + " FROM `"+sta.tableName+"` AS s"
+                    + " WHERE s.site_id=? AND s.mate_id=?";
+                row = sta.db.fetchOne (sql, sid, mid /**/);
+                rst = Synt.mapOf(
+                    "mtime"  , Synt.declare(row.get("mtime"  ), 0L),
+                    "fresh"  , Synt.declare(row.get("fresh"  ), 0 )
+                );
+            } else {
+                rst = new HashMap();
+            }
+
+            // 追加最新消息
+            if (rb.contains("last_chat")) {
+                sql = "SELECT c.mate_id,c.ctime,c.kind,c.note"
+                    + " FROM `"+cha.tableName+"` AS c"
+                    + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
+                    + " WHERE c.site_id=? AND s.mate_id=?"
+                    + " ORDER BY c.ctime";
+                row = cha.db.fetchOne (sql, sid, mid /**/);
+                rst.put("last_chat", Synt.mapOf(
+                    "ctime"  , Synt.declare(row.get("ctime"  ), 0L),
+                    "mate_id", Synt.declare(row.get("mate_id"), ""),
+                    "kind"   , Synt.declare(row.get("kind"   ), ""),
+                    "note"   , Synt.declare(row.get("note"   ), "")
+                ));
+            }
+        } else {
+            if (rb.contains("mtime" )
+            ||  rb.contains("fresh")) {
+                sql = "SELECT MAX(s.mtime) AS mtime, SUM(s.fresh) AS fresh"
+                    + " FROM `"+sta.tableName+"` AS s"
+                    + " WHERE s.site_id=? AND s.mate_id=? AND s.room_id=?";
+                row = sta.db.fetchOne (sql, sid, mid, rid);
+                rst = Synt.mapOf(
+                    "mtime"  , Synt.declare(row.get("mtime"  ), 0L),
+                    "fresh"  , Synt.declare(row.get("fresh"  ), 0 )
+                );
+            } else {
+                rst = new HashMap();
+            }
+
+            // 追加最新消息
+            if (rb.contains("last_chat")) {
+                sql = "SELECT c.mate_id,c.ctime,c.kind,c.note"
+                    + " FROM `"+cha.tableName+"` AS c"
+                    + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
+                    + " WHERE c.site_id=? AND s.mate_id=? AND c.room_id=?"
+                    + " ORDER BY c.ctime";
+                row = cha.db.fetchOne (sql, sid, mid, rid);
+                rst.put("last_chat", Synt.mapOf(
+                    "ctime"  , Synt.declare(row.get("ctime"  ), 0L),
+                    "mate_id", Synt.declare(row.get("mate_id"), ""),
+                    "kind"   , Synt.declare(row.get("kind"   ), ""),
+                    "note"   , Synt.declare(row.get("note"   ), "")
+                ));
+            }
+        }
+
+        helper.reply("", rst);
     }
 
     @Action("stat/create")
@@ -167,6 +195,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
+    @CommitSuccess
     public void createStat(ActionHelper helper) throws HongsException {
         Model  mod = DB.getInstance("masque").getModel("stat");
         Map    req = helper.getRequestData( );
@@ -233,6 +262,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
+    @CommitSuccess
     public void createRoom(ActionHelper helper) throws HongsException {
         Model  mod = DB.getInstance("masque").getModel("room");
         Map    req = helper.getRequestData( );
@@ -296,6 +326,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
+    @CommitSuccess
     public void createMate(ActionHelper helper) throws HongsException {
         Model  mod = DB.getInstance("masque").getModel("mate");
         Map    req = helper.getRequestData( );
@@ -333,6 +364,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
+    @CommitSuccess
     public void createToken(ActionHelper helper) throws HongsException {
         Map    req = helper.getRequestData( );
         String tok = (String)req.get("token");
@@ -358,6 +390,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
+    @CommitSuccess
     public void deleteToken(ActionHelper helper) throws HongsException {
         Map    req = helper.getRequestData( );
         String tok = (String)req.get("token");
@@ -377,12 +410,12 @@ public class MasqueAction {
 
     /**
      * 追加最新消息
-     * @param sid
      * @param mid
+     * @param sid
      * @param rsp
      * @throws HongsException
      */
-    private  void  addLastNote(String sid, String mid, Map rsp) throws HongsException {
+    private void addLastChat(String mid, String sid, Map rsp) throws HongsException {
         List <Map> ls = (List) rsp.get("list");
         if  ( ls == null || ls.isEmpty( ) )  {
             return;
@@ -392,23 +425,30 @@ public class MasqueAction {
                      .getTable   ( "chat" );
         try (
             PreparedStatement ps = tb.db.prepareStatement(
-                "SELECT `note` FROM `" + tb.tableName + "`"
-              + " WHERE `site_id` = ?"
-              +   " AND `mate_id` = ?"
-              +   " AND `room_id` = ?"
+                "SELECT `mate_id`,`ctime`,`kind`,`note`"
+              +  " FROM `"  + tb.tableName +  "`"
+              + " WHERE `site_id`=?"
+              +   " AND `room_id`=?"
               + " ORDER BY `ctime` DESC"
-              + " LIMIT 1"    );
+              + " LIMIT 1" );
         )   {
-            ps.setObject(1,sid);
-            ps.setObject(2,mid);
-            for ( Map ra : ls ) {
-                ps.setString(3, (String)ra.get("room_id"));
-                ResultSet rs = ps.executeQuery();
-                ra.put("note", rs.getString (1));
+                Object   rid;
+                ResultSet rs;
+                ps.setString( 1 , sid );
+            for (Map ra : ls) {
+                rid = ra.get("room_id");
+                ps.setObject( 2 , rid );
+                rs  = ps.executeQuery();
+                ra.put("last_chat", Synt.mapOf(
+                    "mate_id", rs.getString(1),
+                    "ctime"  , rs.getLong  (2),
+                    "kind"   , rs.getString(3),
+                    "note"   , rs.getString(4)
+                ));
             }
         }
         catch (SQLException ex) {
-            throw new HongsException.Common (ex);
+            throw new HongsException.Common(ex);
         }
     }
 
