@@ -11,6 +11,8 @@ import io.github.ihongs.action.anno.CommitSuccess;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Model;
 import io.github.ihongs.db.Table;
+import io.github.ihongs.db.util.FetchCase;
+import io.github.ihongs.db.util.FetchMore;
 import io.github.ihongs.normal.serv.Record;
 import io.github.ihongs.util.Data;
 import io.github.ihongs.util.Digest;
@@ -104,10 +106,21 @@ public class MasqueAction {
             // 获取状态列表
             Model  mod = DB.getInstance("masque").getModel("stat");
             Map    rsp = mod.search( req );
+            List<Map> ls = (List) rsp.get("list");
 
-            // 追加最新消息
-            if (rb.contains("last_chat") ) {
-                addLastChat(mid, sid, rsp);
+            if (ls != null && ! ls.isEmpty()) {
+                // 追加最新消息
+                if (rb.contains("last_chat")) {
+                    addLastChat(sid, ls);
+                }
+                // 追加频道信息
+                if (rb.contains("room")) {
+                    addRoomInfo(sid, ls);
+                }
+                // 追加用户信息
+                if (rb.contains("mate")) {
+                    addMateInfo(sid, ls);
+                }
             }
 
             helper.reply(rsp);
@@ -142,18 +155,25 @@ public class MasqueAction {
 
             // 追加最新消息
             if (rb.contains("last_chat")) {
-                sql = "SELECT c.mate_id,c.ctime,c.kind,c.note"
+                sql = "SELECT s.room_id,c.mate_id,c.ctime,c.kind,c.note"
                     + " FROM `"+cha.tableName+"` AS c"
                     + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
                     + " WHERE c.site_id=? AND s.mate_id=?"
                     + " ORDER BY c.ctime";
                 row = cha.db.fetchOne (sql, sid, mid /**/);
-                rst.put("last_chat", Synt.mapOf(
-                    "ctime"  , Synt.declare(row.get("ctime"  ), 0L),
-                    "mate_id", Synt.declare(row.get("mate_id"), ""),
-                    "kind"   , Synt.declare(row.get("kind"   ), ""),
-                    "note"   , Synt.declare(row.get("note"   ), "")
-                ));
+                rst.put("room_id"  , row.get( "room_id" ));
+                rst.put("mate_id"  , row.get( "mate_id" ));
+                rst.put("last_chat", row);
+
+                List<Map> ls = Synt.listOf(rst);
+                // 追加频道信息
+                if (rb.contains("room")) {
+                    addRoomInfo(sid, ls);
+                }
+                // 追加用户信息
+                if (rb.contains("mate")) {
+                    addMateInfo(sid, ls);
+                }
             }
         } else {
             if (rb.contains("mtime" )
@@ -172,18 +192,25 @@ public class MasqueAction {
 
             // 追加最新消息
             if (rb.contains("last_chat")) {
-                sql = "SELECT c.mate_id,c.ctime,c.kind,c.note"
+                sql = "SELECT s.room_id,c.mate_id,c.ctime,c.kind,c.note"
                     + " FROM `"+cha.tableName+"` AS c"
                     + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
                     + " WHERE c.site_id=? AND s.mate_id=? AND c.room_id=?"
                     + " ORDER BY c.ctime";
                 row = cha.db.fetchOne (sql, sid, mid, rid);
-                rst.put("last_chat", Synt.mapOf(
-                    "ctime"  , Synt.declare(row.get("ctime"  ), 0L),
-                    "mate_id", Synt.declare(row.get("mate_id"), ""),
-                    "kind"   , Synt.declare(row.get("kind"   ), ""),
-                    "note"   , Synt.declare(row.get("note"   ), "")
-                ));
+                rst.put("room_id"  , row.get( "room_id" ));
+                rst.put("mate_id"  , row.get( "mate_id" ));
+                rst.put("last_chat", row);
+
+                List<Map> ls = Synt.listOf(rst);
+                // 追加频道信息
+                if (rb.contains("room")) {
+                    addRoomInfo(sid, ls);
+                }
+                // 追加用户信息
+                if (rb.contains("mate")) {
+                    addMateInfo(sid, ls);
+                }
             }
         }
 
@@ -410,17 +437,11 @@ public class MasqueAction {
 
     /**
      * 追加最新消息
-     * @param mid
      * @param sid
-     * @param rsp
+     * @param ls
      * @throws HongsException
      */
-    private void addLastChat(String mid, String sid, Map rsp) throws HongsException {
-        List <Map> ls = (List) rsp.get("list");
-        if  ( ls == null || ls.isEmpty( ) )  {
-            return;
-        }
-
+    private void addLastChat(String sid, List<Map> ls) throws HongsException {
         Table tb = DB.getInstance("masque")
                      .getTable   ( "chat" );
         try (
@@ -435,21 +456,61 @@ public class MasqueAction {
                 Object   rid;
                 ResultSet rs;
                 ps.setString( 1 , sid );
-            for (Map ra : ls) {
+                Map em = new HashMap( );
+            for(Map ra : ls) {
                 rid = ra.get("room_id");
                 ps.setObject( 2 , rid );
                 rs  = ps.executeQuery();
-                ra.put("last_chat", Synt.mapOf(
-                    "mate_id", rs.getString(1),
-                    "ctime"  , rs.getLong  (2),
-                    "kind"   , rs.getString(3),
-                    "note"   , rs.getString(4)
-                ));
+                if (! rs.next() ) {
+                    ra.put("mate_id"  , "" );
+                    ra.put("last_chat", em );
+                } else {
+                    ra.put("mate_id"  , rs.getString(1));
+                    ra.put("last_chat", Synt.mapOf(
+                           "mate_id"  , rs.getString(1) ,
+                           "ctime"    , rs.getLong  (2) ,
+                           "kind"     , rs.getString(3) ,
+                           "note"     , rs.getString(4)
+                    ));
+                }
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new HongsException.Common(ex);
         }
+    }
+
+    /**
+     * 追加频道信息
+     * @param sid
+     * @param ls
+     * @throws HongsException
+     */
+    private void addRoomInfo(String sid, List<Map> ls) throws HongsException {
+        Table tb = DB.getInstance("masque")
+                     .getTable   ( "room" );
+        new FetchMore(ls).join(tb,
+        new FetchCase(  )
+            .select("`room_id`,`name`,`icon`,`note`")
+            .filter("`site_id` = ?", sid),
+            "room_id", "room_id"
+        );
+    }
+
+    /**
+     * 追加用户信息
+     * @param sid
+     * @param ls
+     * @throws HongsException
+     */
+    private void addMateInfo(String sid, List<Map> ls) throws HongsException {
+        Table tb = DB.getInstance("masque")
+                     .getTable   ( "mate" );
+        new FetchMore(ls).join(tb,
+        new FetchCase(  )
+            .select("`mate_id`,`name`,`icon`,`note`")
+            .filter("`site_id` = ?", sid),
+            "mate_id", "mate_id"
+        );
     }
 
     /**
