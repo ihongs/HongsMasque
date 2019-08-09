@@ -14,7 +14,7 @@ import io.github.ihongs.db.Table;
 import io.github.ihongs.db.util.FetchCase;
 import io.github.ihongs.db.util.FetchMore;
 import io.github.ihongs.normal.serv.Record;
-import io.github.ihongs.util.Data;
+import io.github.ihongs.util.Dawn;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Remote;
 import io.github.ihongs.util.Synt;
@@ -542,7 +542,7 @@ public class MasqueAction {
             for (Map info : ( List<Map> ) list ) {
                 info.put("icon", fixHostName(info.get("icon")));
             }
-            return Data.toString(Synt.mapOf(
+            return Dawn.toString(Synt.mapOf(
                 "ok"  , true,
                 "list", list
             ));
@@ -556,7 +556,7 @@ public class MasqueAction {
                     "site_id", sid,
                     tab+"_id", ids
                 ));
-                return Data.toString(rst);
+                return Dawn.toString(rst);
             }
             catch (ClassCastException ex) {
                 throw new HongsException.Common(ex);
