@@ -2,8 +2,8 @@ package io.github.ihongs.util.verify;
 
 import io.github.ihongs.Core;
 import io.github.ihongs.util.Dawn;
+import io.github.ihongs.util.Syno;
 import io.github.ihongs.util.Synt;
-import io.github.ihongs.util.Tool;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class MasqueChatData extends Rule {
         switch(kind) {
             case "image":
             {
-                String name = Tool.splitPath (id);
+                String name = Syno.splitPath (id);
                 String path = Core.BASE_PATH+"/static/upload/masque/"+kind+"/"+name;
                 String href = Core.BASE_HREF+"/static/upload/masque/"+kind+"/"+name;
                        href = Core.SITE_HREF+href;
@@ -51,7 +51,7 @@ public class MasqueChatData extends Rule {
             case "voice":
             case "file" :
             {
-                String name = Tool.splitPath (id);
+                String name = Syno.splitPath (id);
                 String path = Core.BASE_PATH+"/static/upload/masque/"+kind+"/"+name;
                 String href = Core.BASE_HREF+"/static/upload/masque/"+kind+"/"+name;
                        href = Core.SITE_HREF+href;
