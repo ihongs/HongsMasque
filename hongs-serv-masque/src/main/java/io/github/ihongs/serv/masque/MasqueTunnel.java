@@ -9,7 +9,7 @@ import io.github.ihongs.db.Table;
 import io.github.ihongs.db.link.Loop;
 import io.github.ihongs.util.Dawn;
 import io.github.ihongs.util.Dict;
-import io.github.ihongs.util.Tool;
+import io.github.ihongs.util.Syno;
 import io.github.ihongs.util.thread.Async;
 import java.io.IOException;
 import java.net.URI;
@@ -322,7 +322,7 @@ public final class MasqueTunnel {
                     // 调试输出
                     if (0 != Core.DEBUG && 8 != (8 & Core.DEBUG)) {
                         int    code = resp.getStatusLine().getStatusCode();
-                        String text = Tool.indent(EntityUtils.toString(resp.getEntity(),"UTF-8").trim());
+                        String text = Syno.indent(EntityUtils.toString(resp.getEntity(),"UTF-8").trim());
                         CoreLogger.debug("Masque remote notify, URL: {}, MSG: {}, RSP({}): {}", info.url, info.msg , code, text);
                     }
                 }
