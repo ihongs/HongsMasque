@@ -194,8 +194,8 @@ public final class MasqueTunnel {
                     ins.executeUpdate(  );
                 }
             }
-            catch ( SQLException ex) {
-                throw new HongsException.Common(ex);
+            catch (SQLException ex) {
+                throw new HongsException(ex);
             }
         }
 
@@ -302,8 +302,8 @@ public final class MasqueTunnel {
                     Object obj = Core.getInstance(cls);
                     ( (Consumer) obj).accept(info.msg);
                 }
-                catch (ClassCastException e) {
-                    throw new HongsException.Common(e);
+                catch (ClassCastException ex) {
+                    throw new HongsException(ex);
                 }
             }  else {
                 try {
@@ -326,11 +326,11 @@ public final class MasqueTunnel {
                         CoreLogger.debug("Masque remote notify, URL: {}, MSG: {}, RSP({}): {}", info.url, info.msg , code, text);
                     }
                 }
-                catch (URISyntaxException e) {
-                    throw new HongsException.Common(e);
+                catch (URISyntaxException ex) {
+                    throw new HongsException(ex);
                 }
-                catch (IOException e) {
-                    throw new HongsException.Common(e);
+                catch (IOException ex) {
+                    throw new HongsException(ex);
                 }
             }
         }

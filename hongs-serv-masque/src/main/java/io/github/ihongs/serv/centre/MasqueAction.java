@@ -475,7 +475,7 @@ public class MasqueAction {
                 }
             }
         } catch (SQLException ex) {
-            throw new HongsException.Common(ex);
+            throw new HongsException(ex);
         }
     }
 
@@ -559,7 +559,7 @@ public class MasqueAction {
                 return Dawn.toString(rst);
             }
             catch (ClassCastException ex) {
-                throw new HongsException.Common(ex);
+                throw new HongsException(ex);
             }
         }
 
