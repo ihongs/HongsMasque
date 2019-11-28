@@ -1,7 +1,7 @@
 <h2>聊天测试</h2>
 <div id="masque-site-chat">
     <form class="form-horizontal" data-module="hsForm">
-        <div class="form-group">
+        <div class="row form-group">
             <label class="control-label col-xs-3">成员</label>
             <div class="col-xs-6">
                 <div class="input-group">
@@ -13,7 +13,7 @@
             </div>
             <div class="col-xs-3 help-block form-control-static"></div>
         </div>
-        <div class="form-group">
+        <div class="row form-group">
             <label class="control-label col-xs-3">频道</label>
             <div class="col-xs-6">
                 <div class="input-group">
@@ -25,33 +25,36 @@
             </div>
             <div class="col-xs-3 help-block form-control-static"></div>
         </div>
-        <div class="form-group">
+        <hr/>
+        <div class="row">
             <div class="col-xs-6 col-xs-offset-3">
                 <button type="submit" class="commit btn btn-primary">生成</button>
                 <button type="button" class="cancel btn btn-link"   >关闭</button>
             </div>
         </div>
+        <br/>
     </form>
     <fieldset class="form-horizontal" style="display: none;">
         <legend>连接参数</legend>
-        <div class="form-group">
+        <div class="row form-group">
             <label class="control-label col-xs-3">令牌</label>
             <div class="col-xs-9">
                 <p class="form-control-static"><b data-fn="tok"></b></p>
             </div>
         </div>
-        <div class="form-group">
+        <div class="row form-group">
             <label class="control-label col-xs-3">链接</label>
             <div class="col-xs-9">
                 <p class="form-control-static"><a data-fn="url"></a></p>
             </div>
         </div>
-        <div class="form-group">
+        <div class="row form-group" style="margin-bottom: 0;">
             <label class="control-label col-xs-3">WebSocket 链接</label>
             <div class="col-xs-9">
                 <p class="form-control-static"><a data-fn="wsl"></a></p>
             </div>
         </div>
+        <br/>
     </fieldset>
 </div>
 <script type="text/javascript">
