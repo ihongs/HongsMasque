@@ -52,8 +52,8 @@ public class MasqueAction {
 //          req.remove("sk");
 //      }
 
-        Map    rsp = ett.create(req);
-        helper.reply("", rsp);
+        String nid = ett.create(req);
+        helper.reply("", nid);
     }
 
     @Action("site/update")
@@ -108,8 +108,8 @@ public class MasqueAction {
     throws HongsException {
         Model  ett = DB.getInstance("masque").getModel("room");
         Map    req = helper.getRequestData();
-        Map    rsp = ett.create(req);
-        helper.reply("", rsp);
+        String nid = ett.create(req);
+        helper.reply("", nid);
     }
 
     @Action("room/update")
@@ -156,8 +156,8 @@ public class MasqueAction {
     throws HongsException {
         Model  ett = DB.getInstance("masque").getModel("mate");
         Map    req = helper.getRequestData();
-        Map    rsp = ett.create(req);
-        helper.reply("", rsp);
+        String nid = ett.create(req);
+        helper.reply("", nid);
     }
 
     @Action("mate/update")
