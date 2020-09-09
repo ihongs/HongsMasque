@@ -214,7 +214,7 @@ public class MasqueAction {
             }
         }
 
-        helper.reply("", rst);
+        helper.reply(Synt.mapOf("info", rst));
     }
 
     @Action("stat/create")
