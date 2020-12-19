@@ -242,7 +242,7 @@ public class MasqueAction {
         req.put("mate_id", req.get("mine_id")); // 当前用户
 
         /**
-         * 0x104e 表示 SQL 错误,
+         * 1045 表示 SQL 错误,
          * 当触发唯一索引约束时就会抛出,
          * 此处用于区分记录是否已经存在.
          * createRoom,createMate 同此.
@@ -250,8 +250,8 @@ public class MasqueAction {
         try {
             mod.add(req);
             helper.reply("", 1);
-        } catch ( HongsException e) {
-        if (e.getErrno() == 0x104e) {
+        } catch (HongsException e) {
+        if (e.getErrno( ) == 1045) {
             helper.reply("", 0);
         } else {
             helper.fault(e.getLocalizedMessage());
@@ -314,8 +314,8 @@ public class MasqueAction {
                 mod.add(/**/req);
             }
             helper.reply("", 1 );
-        } catch ( HongsException e) {
-        if (e.getErrno() == 0x104e) {
+        } catch (HongsException e) {
+        if (e.getErrno( ) == 1045) {
             helper.reply("", 0 );
         } else {
             helper.fault(e.getLocalizedMessage());
@@ -378,8 +378,8 @@ public class MasqueAction {
                 mod.add(/**/req);
             }
             helper.reply("", 1 );
-        } catch ( HongsException e) {
-        if (e.getErrno() == 0x104e) {
+        } catch (HongsException e) {
+        if (e.getErrno( ) == 1045) {
             helper.reply("", 0 );
         } else {
             helper.fault(e.getLocalizedMessage());
