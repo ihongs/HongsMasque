@@ -32,6 +32,6 @@
         )));
         ah.reply(vh.verify(rd, true, true));
     } else {
-        throw new HongsException(0x1100, "Unsupported type!");
+        throw new HongsException(400, "Unsupported type!");
     }
 %>
