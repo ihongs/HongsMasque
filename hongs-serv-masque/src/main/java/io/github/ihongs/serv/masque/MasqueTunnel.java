@@ -320,10 +320,10 @@ public final class MasqueTunnel {
                         .execute( http );
 
                     // 调试输出
-                    if (0 != Core.DEBUG && 8 != (8 & Core.DEBUG)) {
+                    if (4 == (4 & Core.DEBUG)) {
                         int    code = resp.getStatusLine().getStatusCode();
                         String text = Syno.indent(EntityUtils.toString(resp.getEntity(),"UTF-8").trim());
-                        CoreLogger.debug("Masque remote notify, URL: {}, MSG: {}, RSP({}): {}", info.url, info.msg , code, text);
+                        CoreLogger.debug("Masque remote notify, URL: {}, MSG: {}, RSP({}): {}", info.url, info.msg, code, text);
                     }
                 }
                 catch (URISyntaxException ex) {
