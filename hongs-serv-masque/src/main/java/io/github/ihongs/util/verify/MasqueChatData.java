@@ -23,10 +23,10 @@ public class MasqueChatData extends Rule {
         switch(kind) {
             case "image":
             {
-                String name = Syno.splitPath (id);
+                String name = Syno.splitPath ( id );
+                String href = Core.SERVER_HREF.get()
+                            + Core.BASE_HREF+"/static/upload/masque/"+kind+"/"+name;
                 String path = Core.BASE_PATH+"/static/upload/masque/"+kind+"/"+name;
-                String href = Core.BASE_HREF+"/static/upload/masque/"+kind+"/"+name;
-                       href = Core.SITE_HREF+href;
                 File   dir  = new File(path).getParentFile();
                 if ( ! dir.exists()) {
                        dir.mkdirs();
@@ -54,7 +54,7 @@ public class MasqueChatData extends Rule {
                 String name = Syno.splitPath (id);
                 String path = Core.BASE_PATH+"/static/upload/masque/"+kind+"/"+name;
                 String href = Core.BASE_HREF+"/static/upload/masque/"+kind+"/"+name;
-                       href = Core.SITE_HREF+href;
+                       href = Core.SERVER_HREF.get() + href ;
                 File   dir  = new File(path).getParentFile();
                 if ( ! dir.exists()) {
                        dir.mkdirs();
