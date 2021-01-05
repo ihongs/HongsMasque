@@ -4,6 +4,7 @@ import io.github.ihongs.Cnst;
 import io.github.ihongs.Core;
 import io.github.ihongs.CoreLocale;
 import io.github.ihongs.HongsException;
+import io.github.ihongs.action.ActionDriver;
 import io.github.ihongs.action.ActionHelper;
 import io.github.ihongs.action.anno.Action;
 import io.github.ihongs.action.anno.Verify;
@@ -26,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 /**
  * 常规消息接口
@@ -539,8 +539,12 @@ public class MasqueAction {
                 .where (tab +"_id IN (?)", ids )
                 .getAll(   );
             // 补全头像链接
-            for (Map info : ( List<Map> ) list ) {
-                info.put("icon", fixHostName(info.get("icon")));
+            for(Map info  : ( List<Map> ) list ) {
+            String  icon  = (String)  info.get("icon");
+                if (icon != null && ! icon.isEmpty() ) {
+                    icon  = ActionDriver.fixUrl( url );
+                }
+                info.put("icon", icon);
             }
             return Dawn.toString(Synt.mapOf(
                 "ok"  , true,
@@ -568,30 +572,5 @@ public class MasqueAction {
             tab+"_ids[]" , ids
         ));
     }
-
-    /**
-     * 补全相对路径的域名和前缀
-     * @param val
-     * @return
-     */
-    private String fixHostName(Object val) {
-        String url = (String) val;
-        if (url == null || url.isEmpty( )) {
-            return url;
-        }
-        if (PRE.matcher(url).find()) {
-            return url;
-        } else
-        if (url.startsWith ( "/" ) ) {
-            return Core.SITE_HREF
-                 + url;
-        } else {
-            return Core.SITE_HREF
-                 + Core.BASE_HREF
-                 + "/"
-                 + url;
-        }
-    }
-    private static final Pattern PRE = Pattern.compile("^(\\w+:)?//");
 
 }
