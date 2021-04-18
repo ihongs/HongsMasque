@@ -114,13 +114,11 @@ public final class MasqueTunnel {
             try {
                 MasqueTunnel.send(info);
             }
-            catch (HongsException ex) {
-                CoreLogger.error (ex);
+            catch (HongsException e) {
+                CoreLogger.error (e);
             }
             finally {
-                Core core = Core.getInstance();
-                core.close();
-                core.clear();
+                Core.getInstance ( ).destroy( );
             }
         }
 
@@ -143,13 +141,11 @@ public final class MasqueTunnel {
             try {
                 MasqueTunnel.send(info);
             }
-            catch (HongsException ex) {
-                CoreLogger.error (ex);
+            catch (HongsException e) {
+                CoreLogger.error (e);
             }
             finally {
-                Core core = Core.getInstance();
-                core.close();
-                core.clear();
+                Core.getInstance ( ).destroy( );
             }
         }
 
