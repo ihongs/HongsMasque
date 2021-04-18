@@ -118,7 +118,9 @@ public final class MasqueTunnel {
                 CoreLogger.error (ex);
             }
             finally {
-                Core.getInstance (  ).close();
+                Core core = Core.getInstance();
+                core.close();
+                core.clear();
             }
         }
 
@@ -145,7 +147,9 @@ public final class MasqueTunnel {
                 CoreLogger.error (ex);
             }
             finally {
-                Core.getInstance (  ).close();
+                Core core = Core.getInstance();
+                core.close();
+                core.clear();
             }
         }
 
