@@ -41,7 +41,7 @@ public final class MasqueTunnel {
     public static Async<Map> getCeiver()
     throws HongsException {
         String name = Ceiver.class.getName();
-        Ceiver inst = (Ceiver) Core.GLOBAL_CORE.got(name);
+        Ceiver inst = (Ceiver) Core.GLOBAL_CORE.get(name);
         if (inst == null) {
             CoreConfig conf = CoreConfig.getInstance("masque");
             inst =  new Ceiver( name,
@@ -60,7 +60,7 @@ public final class MasqueTunnel {
     public static Async<Msg> getSender()
     throws HongsException {
         String name = Sender.class.getName();
-        Sender inst = (Sender) Core.GLOBAL_CORE.got(name);
+        Sender inst = (Sender) Core.GLOBAL_CORE.get(name);
         if (inst == null) {
             CoreConfig conf = CoreConfig.getInstance("masque");
             inst =  new Sender( name,
