@@ -47,7 +47,7 @@ public final class MasqueTunnel {
             inst =  new Ceiver( name,
                     conf.getProperty("core.masque.ceiver.max.tasks", Integer.MAX_VALUE),
                     conf.getProperty("core.masque.ceiver.max.servs", 1));
-            Core.GLOBAL_CORE.put(name, inst);
+            Core.GLOBAL_CORE.set(name, inst);
         }
         return inst;
     }
@@ -66,7 +66,7 @@ public final class MasqueTunnel {
             inst =  new Sender( name,
                     conf.getProperty("core.masque.sender.max.tasks", Integer.MAX_VALUE),
                     conf.getProperty("core.masque.sender.max.servs", 2));
-            Core.GLOBAL_CORE.put(name, inst);
+            Core.GLOBAL_CORE.set(name, inst);
         }
         return inst;
     }
@@ -118,7 +118,7 @@ public final class MasqueTunnel {
                 CoreLogger.error (e);
             }
             finally {
-                Core.getInstance ( ).destroy( );
+                Core.getInstance ( ).reset( );
             }
         }
 
@@ -145,7 +145,7 @@ public final class MasqueTunnel {
                 CoreLogger.error (e);
             }
             finally {
-                Core.getInstance ( ).destroy( );
+                Core.getInstance ( ).reset( );
             }
         }
 
