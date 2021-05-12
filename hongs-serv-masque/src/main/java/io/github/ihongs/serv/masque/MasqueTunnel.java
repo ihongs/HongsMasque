@@ -38,8 +38,7 @@ public final class MasqueTunnel {
      * @return
      * @throws HongsException
      */
-    public static Async<Map> getCeiver()
-    throws HongsException {
+    public static Async<Map> getCeiver() {
         String name = Ceiver.class.getName();
         Ceiver inst = (Ceiver) Core.GLOBAL_CORE.get(name);
         if (inst == null) {
@@ -55,10 +54,8 @@ public final class MasqueTunnel {
     /**
      * 获取发送管道对象
      * @return
-     * @throws HongsException
      */
-    public static Async<Msg> getSender()
-    throws HongsException {
+    public static Async<Msg> getSender() {
         String name = Sender.class.getName();
         Sender inst = (Sender) Core.GLOBAL_CORE.get(name);
         if (inst == null) {
@@ -104,8 +101,7 @@ public final class MasqueTunnel {
     extends Async<Map>
     implements Core.Singleton {
 
-        private Ceiver(String name, int maxTasks, int maxServs)
-        throws HongsException {
+        private Ceiver(String name, int maxTasks, int maxServs) {
             super(name, maxTasks, maxServs);
         }
 
@@ -131,8 +127,7 @@ public final class MasqueTunnel {
     extends Async<Msg>
     implements Core.Singleton {
 
-        private Sender(String name, int maxTasks, int maxServs)
-        throws HongsException {
+        private Sender(String name, int maxTasks, int maxServs) {
             super(name, maxTasks, maxServs);
         }
 
