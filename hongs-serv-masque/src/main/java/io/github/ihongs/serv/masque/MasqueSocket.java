@@ -64,11 +64,13 @@ public class MasqueSocket {
                 veri.addRulesByForm( "masque", "chat" );
             } catch (Wrongs wr) {
                 hepr.reply( wr.toReply( (byte) 0 ) );
+                hepr.flush();
                 sess.close();
                 return;
             } catch (HongsException ex ) {
                 CoreLogger.error  ( ex );
                 hepr.fault(ex.getLocalizedMessage());
+                hepr.flush();
                 sess.close();
                 return;
             }
@@ -118,10 +120,12 @@ public class MasqueSocket {
                 dat = veri.verify( dat, false, true);
             } catch (Wrongs wr) {
                 hepr.reply( wr.toReply(( byte ) 9 ));
+                hepr.flush();
                 return;
             } catch (HongsException ex ) {
+                CoreLogger.error  ( ex );
                 hepr.fault(ex.getLocalizedMessage());
-                CoreLogger.error (  ex );
+                hepr.flush();
                 return;
             }
 
