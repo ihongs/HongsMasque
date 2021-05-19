@@ -275,7 +275,7 @@ public class MasqueAction {
          */
         String rst = getForeData("room", sid, ids);
         if ( null != rst) {
-            helper.write(rst , "application/json");
+            helper.write("application/json" , rst);
             return;
         }
 
@@ -339,7 +339,7 @@ public class MasqueAction {
          */
         String rst = getForeData("mate", sid, ids);
         if ( null != rst) {
-            helper.write(rst , "application/json");
+            helper.write("application/json" , rst);
             return;
         }
 
