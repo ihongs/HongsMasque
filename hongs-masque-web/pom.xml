@@ -13,9 +13,10 @@
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <endorsed.dirs>${project.build.directory}/endorsed</endorsed.dirs>
-        <released.name>HongsMasque</released.name>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <primary.version>1.0-SNAPSHOT</primary.version>
+        <released.name>HongsMasque</released.name>
     </properties>
     <dependencies>
         <dependency>
@@ -89,30 +90,24 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <groupId>org.apache.maven.plugins</groupId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <compilerArguments>
-                        <endorseddirs>${endorsed.dirs}</endorseddirs>
-                    </compilerArguments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <groupId>org.apache.maven.plugins</groupId>
-                <version>2.22.2</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
             <!-- Build target system -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <id>fixed-hongs-core-minify</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <!-- 修正 yuicompressor 将 css calc 内空格删掉的问题 -->
+                                <replace file="${project.build.directory}/${project.build.finalName}/static/centra/base.min.css" token="%+" value="% + "/>
+                                <replace file="${project.build.directory}/${project.build.finalName}/static/centre/base.min.css" token="%+" value="% + "/>
+                            </tasks>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>build-hongs-core-system</id>
                         <phase>package</phase>
