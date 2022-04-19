@@ -37,7 +37,7 @@ public class MasqueAction {
     }
 
     @Action("site/create")
-    @Preset(conf="masque", form="site", defs={":defence"})
+    @Preset(conf="masque", form="site", defs={".defence"})
     @Verify(conf="masque", form="site")
     @CommitSuccess
     public void createSite(ActionHelper helper)
@@ -57,7 +57,7 @@ public class MasqueAction {
     }
 
     @Action("site/update")
-    @Preset(conf="masque", form="site", defs={":defence"})
+    @Preset(conf="masque", form="site", defs={".defence"})
     @Verify(conf="masque", form="site")
     @CommitSuccess
     public void updateSite(ActionHelper helper)
@@ -77,7 +77,7 @@ public class MasqueAction {
     }
 
     @Action("site/delete")
-    @Preset(conf="masque", form="site", defs={":defence"})
+    @Preset(conf="masque", form="site", defs={".defence"})
     @CommitSuccess
     public void deleteSite(ActionHelper helper)
     throws HongsException {
@@ -101,7 +101,7 @@ public class MasqueAction {
     }
 
     @Action("room/create")
-    @Preset(conf="masque", form="room", defs={":defence"})
+    @Preset(conf="masque", form="room", defs={".defence"})
     @Verify(conf="masque", form="room")
     @CommitSuccess
     public void createRoom(ActionHelper helper)
@@ -113,7 +113,7 @@ public class MasqueAction {
     }
 
     @Action("room/update")
-    @Preset(conf="masque", form="room", defs={":defence"})
+    @Preset(conf="masque", form="room", defs={".defence"})
     @Verify(conf="masque", form="room")
     @CommitSuccess
     public void updateRoom(ActionHelper helper)
@@ -125,7 +125,7 @@ public class MasqueAction {
     }
 
     @Action("room/delete")
-    @Preset(conf="masque", form="room", defs={":defence"})
+    @Preset(conf="masque", form="room", defs={".defence"})
     @CommitSuccess
     public void deleteRoom(ActionHelper helper)
     throws HongsException {
@@ -149,7 +149,7 @@ public class MasqueAction {
     }
 
     @Action("mate/create")
-    @Preset(conf="masque", form="mate", defs={":defence"})
+    @Preset(conf="masque", form="mate", defs={".defence"})
     @Verify(conf="masque", form="mate")
     @CommitSuccess
     public void createMate(ActionHelper helper)
@@ -161,7 +161,7 @@ public class MasqueAction {
     }
 
     @Action("mate/update")
-    @Preset(conf="masque", form="mate", defs={":defence"})
+    @Preset(conf="masque", form="mate", defs={".defence"})
     @Verify(conf="masque", form="mate")
     @CommitSuccess
     public void updateMate(ActionHelper helper)
@@ -173,7 +173,7 @@ public class MasqueAction {
     }
 
     @Action("mate/delete")
-    @Preset(conf="masque", form="mate", defs={":defence"})
+    @Preset(conf="masque", form="mate", defs={".defence"})
     @CommitSuccess
     public void deleteMate(ActionHelper helper)
     throws HongsException {
