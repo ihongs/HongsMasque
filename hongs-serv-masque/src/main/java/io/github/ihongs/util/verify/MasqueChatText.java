@@ -33,7 +33,7 @@ public class MasqueChatText extends Rule {
                 return val;
             default:
                 if (val == null || "".equals(val)) {
-                    throw  new  Wrong ( "fore.form.required" );
+                    throw  new  Wrong  ("@fore.form.required");
                 }
                 return val;
         }
