@@ -31,7 +31,7 @@ cd HongsMasque
 mvn package
 cd hongs-masque-web/target/HongsMasque
 # 初始设置
-sh bin/hdo source.setup --DEBUG 0
+sh bin/hdo source setup --DEBUG 0
 # 启动服务
 sh bin/hdo server.start --DEBUG 1
 ```
