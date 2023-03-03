@@ -7,8 +7,8 @@ import io.github.ihongs.HongsException;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Table;
 import io.github.ihongs.db.link.Loop;
-import io.github.ihongs.util.Dawn;
 import io.github.ihongs.util.Dict;
+import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.Syno;
 import io.github.ihongs.util.daemon.Async;
 import java.io.IOException;
@@ -215,7 +215,7 @@ public final class MasqueTunnel {
         String msg;
         msg = "{\"ok\":true,\"ern\":\"\",\"err\":\"\",\"msg\":\"\""
             + ",\"info\":"
-            + Dawn.toString(info)
+            + Dist.toString(info)
             + "}" ;
 
         // 发送消息
@@ -258,9 +258,9 @@ public final class MasqueTunnel {
 
         msg = "{\"ok\":true,\"ern\":\"\",\"err\":\"\",\"msg\":\"\""
             + ",\"info\":"
-            + Dawn.toString(info)
+            + Dist.toString(info)
             + ",\"mids\":"
-            + Dawn.toString(mids)
+            + Dist.toString(mids)
             + "}" ;
 
         // 自定通知

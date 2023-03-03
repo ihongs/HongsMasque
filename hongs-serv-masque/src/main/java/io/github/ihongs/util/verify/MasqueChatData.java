@@ -1,7 +1,7 @@
 package io.github.ihongs.util.verify;
 
 import io.github.ihongs.Core;
-import io.github.ihongs.util.Dawn;
+import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.Syno;
 import io.github.ihongs.util.Synt;
 import java.io.File;
@@ -41,7 +41,7 @@ public class MasqueChatData extends Rule {
                     throw new Wrong (ex, ex.getLocalizedMessage());
                 }
 
-                return Dawn.toString(Synt.mapOf(
+                return Dist.toString(Synt.mapOf(
                     "href", href +    ".png",
                     "snap", href + "_sm.png",
                     "desc", ""
@@ -72,7 +72,7 @@ public class MasqueChatData extends Rule {
                 File sf = new File (Core.BASE_PATH + "/static/upload/tmp/" + val);
                 sf.renameTo(df);
 
-                return Dawn.toString(Synt.mapOf(
+                return Dist.toString(Synt.mapOf(
                     "href", href + name,
                     "snap", "",
                     "desc", ""
@@ -83,7 +83,7 @@ public class MasqueChatData extends Rule {
                     return  val;
                 }
 
-                return Dawn.toString(Synt.mapOf("href", val,
+                return Dist.toString(Synt.mapOf("href", val,
                     "snap", "",
                     "desc", ""
                 ) );

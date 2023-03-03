@@ -6,7 +6,7 @@ import io.github.ihongs.HongsException;
 import io.github.ihongs.action.ActionHelper;
 import io.github.ihongs.action.SocketHelper;
 import io.github.ihongs.action.VerifyHelper;
-import io.github.ihongs.util.Dawn;
+import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.daemon.Async;
 import io.github.ihongs.util.verify.Wrongs;
 import java.io.IOException;
@@ -108,7 +108,7 @@ public class MasqueSocket {
             // 解析数据
             Map dat;
             if (msg.startsWith("{") && msg.endsWith("}") ) {
-                dat = (  Map  ) Dawn.toObject(msg);
+                dat = (  Map  ) Dist.toObject(msg);
             } else {
                 dat = ActionHelper.parseQuery(msg);
             }
