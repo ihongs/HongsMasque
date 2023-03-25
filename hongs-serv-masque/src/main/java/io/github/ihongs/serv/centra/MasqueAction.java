@@ -11,7 +11,7 @@ import io.github.ihongs.action.anno.Select;
 import io.github.ihongs.action.anno.Verify;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Model;
-import io.github.ihongs.normal.serv.Record;
+import io.github.ihongs.serv.Record;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Synt;
 import java.util.Map;

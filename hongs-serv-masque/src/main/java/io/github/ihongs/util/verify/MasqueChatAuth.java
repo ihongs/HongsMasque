@@ -2,7 +2,7 @@ package io.github.ihongs.util.verify;
 
 import io.github.ihongs.HongsException;
 import io.github.ihongs.db.DB;
-import io.github.ihongs.normal.serv.Record;
+import io.github.ihongs.serv.Record;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Synt;
 import java.util.Map;

@@ -14,7 +14,7 @@ import io.github.ihongs.db.Model;
 import io.github.ihongs.db.Table;
 import io.github.ihongs.db.util.FetchCase;
 import io.github.ihongs.db.util.FetchMore;
-import io.github.ihongs.normal.serv.Record;
+import io.github.ihongs.serv.Record;
 import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Remote;
