@@ -93,23 +93,9 @@
             <!-- Build target system -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>1.8</version>
                 <executions>
-                    <!-- 修正 yuicompressor 将 css calc 内空格删掉的问题. 已改用 '50% - -10px' 表示加 -->
-                    <!--
-                    <execution>
-                        <id>fixed-hongs-core-minify</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <replace file="${project.build.directory}/${project.build.finalName}/static/centra/css/base.min.css" token="%+" value="% + "/>
-                                <replace file="${project.build.directory}/${project.build.finalName}/static/centre/css/base.min.css" token="%+" value="% + "/>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                    //-->
                     <execution>
                         <id>build-hongs-core-system</id>
                         <phase>package</phase>
