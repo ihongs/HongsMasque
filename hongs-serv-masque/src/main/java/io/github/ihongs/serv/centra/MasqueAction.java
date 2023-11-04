@@ -11,7 +11,7 @@ import io.github.ihongs.action.anno.Select;
 import io.github.ihongs.action.anno.Verify;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Model;
-import io.github.ihongs.serv.Record;
+import io.github.ihongs.dh.Stores;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Synt;
 import java.util.Map;
@@ -216,7 +216,7 @@ public class MasqueAction {
 
         // 生成临时 token 一天有效
         String sec = Digest.md5(tok+"."+Core.newIdentity());
-        Record.put( "masque.token."+sec, tok, (3600 * 24) );
+        Stores.put( "masque.token."+sec, tok, (3600 * 24) );
 
         helper.reply(Synt.mapOf(
             "token", sec

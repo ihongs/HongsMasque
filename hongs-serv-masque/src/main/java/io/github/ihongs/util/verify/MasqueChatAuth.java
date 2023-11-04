@@ -2,7 +2,7 @@ package io.github.ihongs.util.verify;
 
 import io.github.ihongs.HongsException;
 import io.github.ihongs.db.DB;
-import io.github.ihongs.serv.Record;
+import io.github.ihongs.dh.Stores;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Synt;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class MasqueChatAuth extends Rule {
         }
 
         // 临时 token
-        tok = Synt.asString(Record.get("masque.token." + tok));
+        tok = Synt.asString(Stores.get("masque.token." + tok));
         if (old.equals(tok)) {
             cleans.put("token_level", 2);
             return val;

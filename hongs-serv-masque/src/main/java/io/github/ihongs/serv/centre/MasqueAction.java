@@ -14,7 +14,7 @@ import io.github.ihongs.db.Model;
 import io.github.ihongs.db.Table;
 import io.github.ihongs.db.util.FetchCase;
 import io.github.ihongs.db.util.FetchMore;
-import io.github.ihongs.serv.Record;
+import io.github.ihongs.dh.Stores;
 import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Remote;
@@ -405,7 +405,7 @@ public class MasqueAction {
 
         // 生成临时 token 一天有效
         String sec = Digest.md5(tok+"."+Core.newIdentity());
-        Record.put( "masque.token."+sec, tok, (3600 * 24) );
+        Stores.put( "masque.token."+sec, tok, (3600 * 24) );
 
         helper.reply(Synt.mapOf(
             "token", sec
@@ -430,7 +430,7 @@ public class MasqueAction {
         }
 
         // 移除当前 token
-        Record.del( "masque.token."+tok );
+        Stores.del( "masque.token."+tok );
 
         helper.reply("");
     }
