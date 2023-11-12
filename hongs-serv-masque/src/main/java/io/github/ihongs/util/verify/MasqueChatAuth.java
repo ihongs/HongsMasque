@@ -1,6 +1,6 @@
 package io.github.ihongs.util.verify;
 
-import io.github.ihongs.HongsException;
+import io.github.ihongs.CruxException;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.dh.Roster;
 import io.github.ihongs.util.Digest;
@@ -31,8 +31,8 @@ public class MasqueChatAuth extends Rule {
             .field( "sk" )
             .where( "id=? AND state=1", sid)
             .getOne();
-        } catch (HongsException ex) {
-            throw ex.toExemption( );
+        } catch ( CruxException e) {
+            throw e.toExemption( );
         }
         if (ro.isEmpty()) {
             throw new Wrong("@masque:core.masque.wrong.sites");

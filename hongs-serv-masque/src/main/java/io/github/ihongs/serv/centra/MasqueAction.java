@@ -2,7 +2,7 @@ package io.github.ihongs.serv.centra;
 
 import io.github.ihongs.Cnst;
 import io.github.ihongs.Core;
-import io.github.ihongs.HongsException;
+import io.github.ihongs.CruxException;
 import io.github.ihongs.action.ActionHelper;
 import io.github.ihongs.action.anno.Action;
 import io.github.ihongs.action.anno.CommitSuccess;
@@ -29,7 +29,7 @@ public class MasqueAction {
     @Preset(conf="masque", form="site")
     @Select(conf="masque", form="site")
     public void searchSite(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("site");
         Map    req = helper.getRequestData();
         Map    rsp = ett.search(req);
@@ -41,7 +41,7 @@ public class MasqueAction {
     @Verify(conf="masque", form="site")
     @CommitSuccess
     public void createSite(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("site");
         Map    req = helper.getRequestData();
 
@@ -61,7 +61,7 @@ public class MasqueAction {
     @Verify(conf="masque", form="site")
     @CommitSuccess
     public void updateSite(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("site");
         Map    req = helper.getRequestData();
 
@@ -80,7 +80,7 @@ public class MasqueAction {
     @Preset(conf="masque", form="site", defs={".defence"})
     @CommitSuccess
     public void deleteSite(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("site");
         Map    req = helper.getRequestData();
         int    num = ett.delete(req);
@@ -93,7 +93,7 @@ public class MasqueAction {
     @Preset(conf="masque", form="room")
     @Select(conf="masque", form="room")
     public void searchRoom(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("room");
         Map    req = helper.getRequestData();
         Map    rsp = ett.search(req);
@@ -105,7 +105,7 @@ public class MasqueAction {
     @Verify(conf="masque", form="room")
     @CommitSuccess
     public void createRoom(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("room");
         Map    req = helper.getRequestData();
         String nid = ett.create(req);
@@ -117,7 +117,7 @@ public class MasqueAction {
     @Verify(conf="masque", form="room")
     @CommitSuccess
     public void updateRoom(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("room");
         Map    req = helper.getRequestData();
         int    num = ett.update(req);
@@ -128,7 +128,7 @@ public class MasqueAction {
     @Preset(conf="masque", form="room", defs={".defence"})
     @CommitSuccess
     public void deleteRoom(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("room");
         Map    req = helper.getRequestData();
         int    num = ett.delete(req);
@@ -141,7 +141,7 @@ public class MasqueAction {
     @Preset(conf="masque", form="mate")
     @Select(conf="masque", form="mate")
     public void searchMate(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("mate");
         Map    req = helper.getRequestData();
         Map    rsp = ett.search(req);
@@ -153,7 +153,7 @@ public class MasqueAction {
     @Verify(conf="masque", form="mate")
     @CommitSuccess
     public void createMate(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("mate");
         Map    req = helper.getRequestData();
         String nid = ett.create(req);
@@ -165,7 +165,7 @@ public class MasqueAction {
     @Verify(conf="masque", form="mate")
     @CommitSuccess
     public void updateMate(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("mate");
         Map    req = helper.getRequestData();
         int    num = ett.update(req);
@@ -176,7 +176,7 @@ public class MasqueAction {
     @Preset(conf="masque", form="mate", defs={".defence"})
     @CommitSuccess
     public void deleteMate(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("mate");
         Map    req = helper.getRequestData();
         int    num = ett.delete(req);
@@ -187,7 +187,7 @@ public class MasqueAction {
 
     @Action("token/create")
     public void createToken(ActionHelper helper)
-    throws HongsException {
+    throws CruxException {
         Model  ett = DB.getInstance("masque").getModel("site");
         Map    req = helper.getRequestData();
         Object sid = req.get("site_id");

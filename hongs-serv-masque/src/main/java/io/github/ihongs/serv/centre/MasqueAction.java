@@ -3,7 +3,7 @@ package io.github.ihongs.serv.centre;
 import io.github.ihongs.Cnst;
 import io.github.ihongs.Core;
 import io.github.ihongs.CoreLocale;
-import io.github.ihongs.HongsException;
+import io.github.ihongs.CruxException;
 import io.github.ihongs.action.ActionDriver;
 import io.github.ihongs.action.ActionHelper;
 import io.github.ihongs.action.anno.Action;
@@ -40,7 +40,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
-    public void searchChat(ActionHelper helper) throws HongsException {
+    public void searchChat(ActionHelper helper) throws CruxException {
         Model  mod = DB.getInstance("masque").getModel("chat");
         Table  sta = DB.getInstance("masque").getTable("stat");
         Map    req = helper.getRequestData( );
@@ -73,7 +73,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
-    public void searchStat(ActionHelper helper) throws HongsException {
+    public void searchStat(ActionHelper helper) throws CruxException {
         Map    req = helper.getRequestData( );
         String sid = (String) req.get("site_id");
         String rid = (String) req.get("room_id");
@@ -223,7 +223,7 @@ public class MasqueAction {
         form = "auth"
     )
     @CommitSuccess
-    public void createStat(ActionHelper helper) throws HongsException {
+    public void createStat(ActionHelper helper) throws CruxException {
         Model  mod = DB.getInstance("masque").getModel("stat");
         Map    req = helper.getRequestData( );
 
@@ -250,7 +250,7 @@ public class MasqueAction {
         try {
             mod.add(req);
             helper.reply("", 1);
-        } catch (HongsException e) {
+        } catch (CruxException e) {
         if (e.getErrno( ) == 1045) {
             helper.reply("", 0);
         } else {
@@ -263,7 +263,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
-    public void searchRoom(ActionHelper helper) throws HongsException {
+    public void searchRoom(ActionHelper helper) throws CruxException {
         Map    req = helper.getRequestData( );
         Set    ids = Synt.asSet(req.get("room_id"));
         String sid = ( String ) req.get("site_id");
@@ -290,7 +290,7 @@ public class MasqueAction {
         form = "auth"
     )
     @CommitSuccess
-    public void createRoom(ActionHelper helper) throws HongsException {
+    public void createRoom(ActionHelper helper) throws CruxException {
         Model  mod = DB.getInstance("masque").getModel("room");
         Map    req = helper.getRequestData( );
 
@@ -314,7 +314,7 @@ public class MasqueAction {
                 mod.add(/**/req);
             }
             helper.reply("", 1 );
-        } catch (HongsException e) {
+        } catch (CruxException e) {
         if (e.getErrno( ) == 1045) {
             helper.reply("", 0 );
         } else {
@@ -327,7 +327,7 @@ public class MasqueAction {
         conf = "masque",
         form = "auth"
     )
-    public void searchMate(ActionHelper helper) throws HongsException {
+    public void searchMate(ActionHelper helper) throws CruxException {
         Map    req = helper.getRequestData( );
         Set    ids = Synt.asSet(req.get("mate_id"));
         String sid = ( String ) req.get("site_id");
@@ -354,7 +354,7 @@ public class MasqueAction {
         form = "auth"
     )
     @CommitSuccess
-    public void createMate(ActionHelper helper) throws HongsException {
+    public void createMate(ActionHelper helper) throws CruxException {
         Model  mod = DB.getInstance("masque").getModel("mate");
         Map    req = helper.getRequestData( );
 
@@ -378,7 +378,7 @@ public class MasqueAction {
                 mod.add(/**/req);
             }
             helper.reply("", 1 );
-        } catch (HongsException e) {
+        } catch (CruxException e) {
         if (e.getErrno( ) == 1045) {
             helper.reply("", 0 );
         } else {
@@ -392,7 +392,7 @@ public class MasqueAction {
         form = "auth"
     )
     @CommitSuccess
-    public void createToken(ActionHelper helper) throws HongsException {
+    public void createToken(ActionHelper helper) throws CruxException {
         Map    req = helper.getRequestData( );
         String tok = (String)req.get("token");
 
@@ -418,7 +418,7 @@ public class MasqueAction {
         form = "auth"
     )
     @CommitSuccess
-    public void deleteToken(ActionHelper helper) throws HongsException {
+    public void deleteToken(ActionHelper helper) throws CruxException {
         Map    req = helper.getRequestData( );
         String tok = (String)req.get("token");
 
@@ -439,9 +439,9 @@ public class MasqueAction {
      * 追加最新消息
      * @param sid
      * @param ls
-     * @throws HongsException
+     * @throws CruxException
      */
-    private void addLastChat(String sid, List<Map> ls) throws HongsException {
+    private void addLastChat(String sid, List<Map> ls) throws CruxException {
         Table tb = DB.getInstance("masque")
                      .getTable   ( "chat" );
         try (
@@ -475,7 +475,7 @@ public class MasqueAction {
                 }
             }
         } catch (SQLException ex) {
-            throw new HongsException(ex);
+            throw new CruxException(ex);
         }
     }
 
@@ -483,9 +483,9 @@ public class MasqueAction {
      * 追加频道信息
      * @param sid
      * @param ls
-     * @throws HongsException
+     * @throws CruxException
      */
-    private void addRoomInfo(String sid, List<Map> ls) throws HongsException {
+    private void addRoomInfo(String sid, List<Map> ls) throws CruxException {
         Table tb = DB.getInstance("masque")
                      .getTable   ( "room" );
         new FetchMore(ls).join(tb,
@@ -500,9 +500,9 @@ public class MasqueAction {
      * 追加用户信息
      * @param sid
      * @param ls
-     * @throws HongsException
+     * @throws CruxException
      */
-    private void addMateInfo(String sid, List<Map> ls) throws HongsException {
+    private void addMateInfo(String sid, List<Map> ls) throws CruxException {
         Table tb = DB.getInstance("masque")
                      .getTable   ( "mate" );
         new FetchMore(ls).join(tb,
@@ -519,9 +519,9 @@ public class MasqueAction {
      * @param sid
      * @param ids
      * @return
-     * @throws HongsException
+     * @throws CruxException
      */
-    private String getForeData(String tab, String sid, Set ids) throws HongsException {
+    private String getForeData(String tab, String sid, Set ids) throws CruxException {
         Map row = DB.getInstance("masque")
             .with  ("site")
             .field (tab + "_url")
@@ -563,7 +563,7 @@ public class MasqueAction {
                 return Dist.toString(rst);
             }
             catch (ClassCastException ex) {
-                throw new HongsException(ex);
+                throw new CruxException(ex);
             }
         }
 

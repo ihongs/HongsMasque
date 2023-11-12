@@ -3,7 +3,7 @@ package io.github.ihongs.serv.masque;
 import io.github.ihongs.Core;
 import io.github.ihongs.CoreConfig;
 import io.github.ihongs.CoreLogger;
-import io.github.ihongs.HongsException;
+import io.github.ihongs.CruxException;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Table;
 import io.github.ihongs.db.link.Loop;
@@ -36,7 +36,7 @@ public final class MasqueTunnel {
     /**
      * 后去接收管道对象
      * @return
-     * @throws HongsException
+     * @throws CruxException
      */
     public static Async<Map> getCeiver() {
         String name = Ceiver.class.getName();
@@ -110,11 +110,11 @@ public final class MasqueTunnel {
             try {
                 MasqueTunnel.send(info);
             }
-            catch (HongsException e) {
-                CoreLogger.error (e);
+            catch (CruxException e) {
+                CoreLogger.error(e);
             }
             finally {
-                Core.getInstance ( ).reset( );
+                Core.getInstance( ).reset( );
             }
         }
 
@@ -136,11 +136,11 @@ public final class MasqueTunnel {
             try {
                 MasqueTunnel.send(info);
             }
-            catch (HongsException e) {
-                CoreLogger.error (e);
+            catch (CruxException e) {
+                CoreLogger.error(e);
             }
             finally {
-                Core.getInstance ( ).reset( );
+                Core.getInstance( ).reset( );
             }
         }
 
@@ -157,7 +157,7 @@ public final class MasqueTunnel {
         private String sid = null;
         private String rid = null;
 
-        public ChatSet() throws HongsException {
+        public ChatSet() throws CruxException {
             now = System.currentTimeMillis();
             db  = DB.getInstance( "masque" );
                   db.open();
@@ -167,14 +167,14 @@ public final class MasqueTunnel {
             ins = db.prepareStatement("INSERT INTO `"+stb.tableName+"` (`fresh`,`mtime`,`site_id`,`room_id`,`mate_id`,`id`) VALUES (1, ?,?, ?,?, ?)");
         }
 
-        public void store( Map info ) throws HongsException {
+        public void store( Map info ) throws CruxException {
             ctb.insert(info);
 
             sid = (String) info.get("site_id");
             rid = (String) info.get("room_id");
         }
 
-        public void fresh(String mid) throws HongsException {
+        public void fresh(String mid) throws CruxException {
             try {
                     upd.setObject(1, now);
                     upd.setObject(2, sid);
@@ -190,13 +190,13 @@ public final class MasqueTunnel {
                 }
             }
             catch (SQLException ex) {
-                throw new HongsException(ex);
+                throw new CruxException(ex);
             }
         }
 
     }
 
-    private static void send(Map info) throws HongsException {
+    private static void send(Map info) throws CruxException {
         String siteId = (String) info.get("site_id");
         String roomId = (String) info.get("room_id");
         String mateId = (String) info.get("mate_id");
@@ -247,8 +247,8 @@ public final class MasqueTunnel {
             try {
                 chat.fresh (mid);
             }
-            catch (HongsException ex) {
-                CoreLogger.error (ex);
+            catch (CruxException ex) {
+                CoreLogger.error(ex);
             }
         }
 
@@ -284,7 +284,7 @@ public final class MasqueTunnel {
         }
     }
 
-    private static void send(Msg info) throws HongsException {
+    private static void send(Msg info) throws CruxException {
         if (info.ses != null) {
             info.ses
                 .getAsyncRemote (  )
@@ -298,7 +298,7 @@ public final class MasqueTunnel {
                     ( (Consumer) obj).accept(info.msg);
                 }
                 catch (ClassCastException ex) {
-                    throw new HongsException(ex);
+                    throw new CruxException(ex);
                 }
             }  else {
                 try {
@@ -322,17 +322,17 @@ public final class MasqueTunnel {
                     }
                 }
                 catch (URISyntaxException ex) {
-                    throw new HongsException(ex);
+                    throw new CruxException(ex);
                 }
                 catch (IOException ex) {
-                    throw new HongsException(ex);
+                    throw new CruxException(ex);
                 }
             }
         }
     }
 
     private static     String  getNoteUrl(String siteId)
-    throws HongsException {
+    throws CruxException {
         DB   db = DB.getInstance("masque");
         Loop rs = db.with  ("site"       )
                     .field ("note_url"   )
@@ -346,7 +346,7 @@ public final class MasqueTunnel {
     }
 
     private static Set<String> getMateIds(String siteId, String roomId, Set<String> mateIds)
-    throws HongsException {
+    throws CruxException {
         Set  ms = new HashSet();
         DB   db = DB.getInstance("masque");
         Loop rs = db.with  ("stat"       )

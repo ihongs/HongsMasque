@@ -2,7 +2,7 @@ package io.github.ihongs.serv.masque;
 
 import io.github.ihongs.Core;
 import io.github.ihongs.CoreLogger;
-import io.github.ihongs.HongsException;
+import io.github.ihongs.CruxException;
 import io.github.ihongs.action.ActionHelper;
 import io.github.ihongs.action.SocketHelper;
 import io.github.ihongs.action.VerifyHelper;
@@ -60,15 +60,15 @@ public class MasqueSocket {
                 veri.addRulesByForm( "masque", "auth" );
                 data = veri.verify(data, false , true );
                 data.put("mate_id",data.get("mine_id"));
-                veri.getRules().clear( );
+                veri.getRules().clear();
                 veri.addRulesByForm( "masque", "chat" );
             } catch (Wrongs wr) {
                 hepr.reply( wr.toReply( (byte) 0 ) );
                 hepr.flush();
                 sess.close();
                 return;
-            } catch (HongsException ex ) {
-                CoreLogger.error  ( ex );
+            } catch (CruxException ex ) {
+                CoreLogger.error ( ex );
                 hepr.fault(ex.getLocalizedMessage());
                 hepr.flush();
                 sess.close();
@@ -122,7 +122,7 @@ public class MasqueSocket {
                 hepr.reply( wr.toReply(( byte ) 9 ));
                 hepr.flush();
                 return;
-            } catch (HongsException ex ) {
+            } catch (CruxException ex ) {
                 CoreLogger.error  ( ex );
                 hepr.fault(ex.getLocalizedMessage());
                 hepr.flush();

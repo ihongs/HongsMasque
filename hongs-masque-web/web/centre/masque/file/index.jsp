@@ -1,7 +1,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="io.github.ihongs.Cnst"%>
 <%@page import="io.github.ihongs.Core"%>
-<%@page import="io.github.ihongs.HongsException"%>
+<%@page import="io.github.ihongs.CruxException"%>
 <%@page import="io.github.ihongs.action.ActionHelper"%>
 <%@page import="io.github.ihongs.action.VerifyHelper"%>
 <%@page import="io.github.ihongs.util.Synt"%>
@@ -32,6 +32,6 @@
         )));
         ah.reply(vh.verify(rd, true, true));
     } else {
-        throw new HongsException(400, "Unsupported type!");
+        throw new CruxException(400, "Unsupported type!");
     }
 %>
