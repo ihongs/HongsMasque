@@ -445,7 +445,7 @@ public class MasqueAction {
         Table tb = DB.getInstance("masque")
                      .getTable   ( "chat" );
         try (
-            PreparedStatement ps = tb.db.prepareStatement(
+            PreparedStatement ps = tb.db.prepare(
                 "SELECT `mate_id`,`ctime`,`kind`,`note`"
               +  " FROM `"  + tb.tableName +  "`"
               + " WHERE `site_id`=?"

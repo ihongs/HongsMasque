@@ -163,8 +163,8 @@ public final class MasqueTunnel {
                   db.open();
             ctb = db.getTable("chat");
             stb = db.getTable("stat");
-            upd = db.prepareStatement("UPDATE `"+stb.tableName+"` SET `fresh`=`fresh`+1,`mtime`=? WHERE `site_id`=? AND `room_id`=? AND `mate_id`=?");
-            ins = db.prepareStatement("INSERT INTO `"+stb.tableName+"` (`fresh`,`mtime`,`site_id`,`room_id`,`mate_id`,`id`) VALUES (1, ?,?, ?,?, ?)");
+            upd = db.prepare("UPDATE `"+stb.tableName+"` SET `fresh`=`fresh`+1,`mtime`=? WHERE `site_id`=? AND `room_id`=? AND `mate_id`=?");
+            ins = db.prepare("INSERT INTO `"+stb.tableName+"` (`fresh`,`mtime`,`site_id`,`room_id`,`mate_id`,`id`) VALUES (1, ?,?, ?,?, ?)");
         }
 
         public void store( Map info ) throws CruxException {
