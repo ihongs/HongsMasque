@@ -6,6 +6,7 @@ import io.github.ihongs.CoreLocale;
 import io.github.ihongs.CruxException;
 import io.github.ihongs.action.ActionDriver;
 import io.github.ihongs.action.ActionHelper;
+import io.github.ihongs.action.VerifyHelper;
 import io.github.ihongs.action.anno.Action;
 import io.github.ihongs.action.anno.Verify;
 import io.github.ihongs.action.anno.CommitSuccess;
@@ -15,10 +16,12 @@ import io.github.ihongs.db.Table;
 import io.github.ihongs.db.util.FetchCase;
 import io.github.ihongs.db.util.FetchMore;
 import io.github.ihongs.dh.Roster;
+import io.github.ihongs.serv.masque.MasqueTunnel;
 import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Remote;
 import io.github.ihongs.util.Synt;
+import io.github.ihongs.util.verify.Wrongs;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,7 +53,7 @@ public class MasqueAction {
          * 默认逆序
          */
         if ( ! req.containsKey(Cnst.OB_KEY)) {
-            req.put (Cnst.OB_KEY, "-ctime");
+            req.put (Cnst.OB_KEY, "ctime!");
         }
 
         helper.reply(mod.search(req));
@@ -66,6 +69,45 @@ public class MasqueAction {
             long   now = Core.ACTION_TIME.get()/1000;
             sta.db.updates (sql, now, sid, rid, mid);
         }
+    }
+
+    @Action("chat/create")
+    @Verify(
+        conf = "masque",
+        form = "auth"
+    )
+    public void createChat(ActionHelper helper) throws CruxException {
+        Map req  = helper.getRequestData();
+        Set  ab  = Synt.toTerms(req.get(Cnst.AB_KEY));
+        byte em  = 0;
+        if ( ab != null) {
+        if ( ab.contains(".errs")) {
+             em  = 1;
+        } else
+        if ( ab.contains("!errs")) {
+             em  = 2;
+        }}
+
+        /**
+         * 校验数据
+         */
+        Map info ;
+        try {
+            info = new VerifyHelper()
+                .addRulesByForm("masque", "chat")
+                .verify (req, false, em  ==  0  );
+        }
+        catch (Wrongs wr) {
+            helper.reply( wr.toReply(em) );
+            return;
+        }
+
+        /**
+         * 推入管道
+         */
+        MasqueTunnel.getCeiver().add(info);
+
+        helper.reply("");
     }
 
     @Action("stat/search")
@@ -249,10 +291,10 @@ public class MasqueAction {
          */
         try {
             mod.add(req);
-            helper.reply("", 1);
+            helper.reply("" , 1 );
         } catch (CruxException e) {
-        if (e.getErrno( ) == 1045) {
-            helper.reply("", 0);
+        if (e.getErrno() == 1045) {
+            helper.reply("" , 0 );
         } else {
             helper.fault(e.getLocalizedMessage());
         }}
@@ -301,22 +343,33 @@ public class MasqueAction {
             return;
         }
 
+        // 没有指定 id 则取一个
+        String rid = Synt.asString(req.get("room_id"));
+        if (rid == null || rid.isEmpty()) {
+            rid = Core.newIdentity();
+            req.put("room_id", rid );
+        }
+
         try {
             Map row = mod.table.fetchCase()
                 .filter("site_id = ?", req.get("site_id") )
                 .filter("room_id = ?", req.get("room_id") )
                 .select("id")
                 .getOne();
+            String id;
             if (row != null && ! row.isEmpty(/**/)) {
-                String id = (String) row.get("id");
-                mod.put(id, req);
+                id = (String) row.get("id");
+                mod.put(id , req);
             } else {
-                mod.add(/**/req);
+                id = mod.add(req);
             }
-            helper.reply("", 1 );
+            helper.reply(Synt.mapOf(
+                "room_id", rid,
+                "id", id
+            ));
         } catch (CruxException e) {
-        if (e.getErrno( ) == 1045) {
-            helper.reply("", 0 );
+        if (e.getErrno() == 1045) {
+            helper.reply("" , 0 );
         } else {
             helper.fault(e.getLocalizedMessage());
         }}
@@ -365,22 +418,33 @@ public class MasqueAction {
             return;
         }
 
+        // 没有指定 id 则取一个
+        String mid = Synt.asString(req.get("room_id"));
+        if (mid == null || mid.isEmpty()) {
+            mid = Core.newIdentity();
+            req.put("room_id", mid );
+        }
+
         try {
             Map row = mod.table.fetchCase()
                 .filter("site_id = ?", req.get("site_id") )
                 .filter("mate_id = ?", req.get("mate_id") )
                 .select("id")
                 .getOne();
+            String id;
             if (row != null && ! row.isEmpty(/**/)) {
-                String id = (String) row.get("id");
-                mod.put(id, req);
+                id = (String) row.get("id");
+                mod.put(id , req);
             } else {
-                mod.add(/**/req);
+                id = mod.add(req);
             }
-            helper.reply("", 1 );
+            helper.reply(Synt.mapOf(
+                "mate_id", mid,
+                "id", id
+            ));
         } catch (CruxException e) {
-        if (e.getErrno( ) == 1045) {
-            helper.reply("", 0 );
+        if (e.getErrno() == 1045) {
+            helper.reply("" , 0 );
         } else {
             helper.fault(e.getLocalizedMessage());
         }}

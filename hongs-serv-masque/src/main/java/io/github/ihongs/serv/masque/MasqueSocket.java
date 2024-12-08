@@ -44,29 +44,13 @@ public class MasqueSocket {
         try (
             SocketHelper hepr = SocketHelper.getInstance(sess, "open");
         ) {
-            Map          prop = sess.getUserProperties();
-            Map          data = new HashMap(/***/);
-            VerifyHelper veri = new VerifyHelper();
-            Async< Map > pipe = MasqueTunnel.getCeiver();
-
             /**
-             * 这里相较 Action 的校验不同
-             * 不能使用 ActionHelper 获取请求数据
-             * 只能通过 VerifyHelper 的值传递会话
-             * 校验过程中以此提取请求、会话数据等
+             * 校验身份
              */
             try {
-                data.putAll( hepr.getRequestData() );
-                veri.addRulesByForm( "masque", "auth" );
-                data = veri.verify(data, false , true );
-                data.put("mate_id",data.get("mine_id"));
-                veri.getRules().clear();
-                veri.addRulesByForm( "masque", "chat" );
-            } catch (Wrongs wr) {
-                hepr.reply( wr.toReply( (byte) 0 ) );
-                hepr.flush();
-                sess.close();
-                return;
+                new VerifyHelper ( )
+                    .addRulesByForm("masque","auth")
+                    . verify( hepr.getRequestData( ), false, true);
             } catch (CruxException ex ) {
                 CoreLogger.error ( ex );
                 hepr.fault(ex.getLocalizedMessage());
@@ -74,11 +58,6 @@ public class MasqueSocket {
                 sess.close();
                 return;
             }
-
-            // 注入环境备后用
-            prop.put("data", data);
-            prop.put(VerifyHelper.class.getName(), veri);
-            prop.put(MasqueTunnel.class.getName(), pipe);
 
             addSession(sess);
         }
@@ -98,39 +77,11 @@ public class MasqueSocket {
     @OnMessage
     public void onMessage(Session sess, String msg) {
         try (
-            SocketHelper hepr = SocketHelper.getInstance(sess, "message");
+            SocketHelper hepr = SocketHelper.getInstance(sess, "error");
         ) {
-            Map          prop = sess.getUserProperties();
-            Map          data = ( Map ) prop.get("data");
-            VerifyHelper veri = (VerifyHelper) prop.get(VerifyHelper.class.getName());
-            Async< Map > pipe = (Async< Map >) prop.get(MasqueTunnel.class.getName());
-
-            // 解析数据
-            Map dat;
-            if (msg.startsWith("{") && msg.endsWith("}") ) {
-                dat = (  Map  ) Dist.toObject(msg);
-            } else {
-                dat = ActionHelper.parseQuery(msg);
-            }
-
-            // 验证数据
-            try {
-                dat.putAll(data);
-                dat.put("id", Core.newIdentity());
-                dat = veri.verify( dat, false, true);
-            } catch (Wrongs wr) {
-                hepr.reply( wr.toReply(( byte ) 9 ));
-                hepr.flush();
-                return;
-            } catch (CruxException ex ) {
-                CoreLogger.error  ( ex );
-                hepr.fault(ex.getLocalizedMessage());
-                hepr.flush();
-                return;
-            }
-
-            // 送入管道
-            pipe.add(dat);
+            hepr.fault( "Unsupported!" );
+            CoreLogger.debug (msg);
+            delSession(sess);
         }
         catch (Exception|Error er) {
             CoreLogger.error ( er);
@@ -142,8 +93,9 @@ public class MasqueSocket {
         try (
             SocketHelper hepr = SocketHelper.getInstance(sess, "error");
         ) {
+            String msg = ar.getMessage();
+            CoreLogger.debug (msg);
             delSession(sess);
-            CoreLogger.debug ( ar.getMessage() );
         }
         catch (Exception|Error er) {
             CoreLogger.error ( er);

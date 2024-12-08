@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `a_masque_room`;
 CREATE TABLE `a_masque_room` (
   `id` CHAR(16) NOT NULL,
   `site_id` CHAR(16) NOT NULL,
-  `room_id` VARCHAR(36) DEFAULT NULL,
+  `room_id` CHAR(36) NOT NULL,
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
   `icon` VARCHAR(100) DEFAULT NULL,
@@ -56,7 +56,8 @@ DROP TABLE IF EXISTS `a_masque_mate`;
 CREATE TABLE `a_masque_mate` (
   `id` CHAR(16) NOT NULL,
   `site_id` CHAR(16) NOT NULL,
-  `mate_id` VARCHAR(36) DEFAULT NULL,
+  `mate_id` CHAR(36) NOT NULL,
+  `type`  TINYINT DEFAULT '0',
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
   `icon` VARCHAR(100) DEFAULT NULL,
@@ -80,8 +81,8 @@ DROP TABLE IF EXISTS `a_masque_chat`;
 CREATE TABLE `a_masque_chat` (
   `id` CHAR(16) NOT NULL,
   `site_id` CHAR(16) NOT NULL,
-  `room_id` VARCHAR(36) NOT NULL,
-  `mate_id` VARCHAR(36) NOT NULL,
+  `room_id` CHAR(36) NOT NULL,
+  `mate_id` CHAR(36) NOT NULL,
   `kind` VARCHAR(10) DEFAULT 'text',
   `note` TEXT DEFAULT NULL,
   `data` TEXT DEFAULT NULL,
@@ -105,8 +106,8 @@ DROP TABLE IF EXISTS `a_masque_stat`;
 CREATE TABLE `a_masque_stat` (
   `id` CHAR(16) NOT NULL,
   `site_id` CHAR(16) NOT NULL,
-  `room_id` VARCHAR(36) NOT NULL,
-  `mate_id` VARCHAR(36) NOT NULL,
+  `room_id` CHAR(36) NOT NULL,
+  `mate_id` CHAR(36) NOT NULL,
   `mtime`  BIGINT DEFAULT NULL, /* 注意: 这里是毫秒 */
   `fresh` INTEGER DEFAULT '0',
   PRIMARY KEY (`id`),

@@ -16,7 +16,7 @@
             <param name="path">static/upload/masque/site</param>
             <param name="thumb-extn">png</param>
             <param name="thumb-mode">pick</param>
-            <param name="thumb-size">_lg:300*300,_md:150*150,_sm:75*75</param>
+            <param name="thumb-size">300*300</param>
             <param name="down-remote">yes</param>
         </field>
         <field name="room_url" text="房间信息接口"></field>
@@ -25,8 +25,11 @@
     </form>
     <form name="room">
         <field name="id" type="string"></field>
-        <field name="site_id" type="站点"></field>
-        <field name="room_id" text="代号"></field>
+        <field name="site_id" text="站点"></field>
+        <field name="room_id" text="代号">
+            <param name="deforce">create</param>
+            <param name="default">@cid</param>
+        </field>
         <field name="name" text="名称"></field>
         <field name="note" text="备注"></field>
         <field name="icon" text="图标" rule="Thumb">
@@ -34,14 +37,22 @@
             <param name="path">static/upload/masque/room</param>
             <param name="thumb-extn">png</param>
             <param name="thumb-mode">pick</param>
-            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
+            <param name="thumb-size">300*300</param>
             <param name="down-remote">yes</param>
         </field>
     </form>
     <form name="mate">
         <field name="id" type="string"></field>
-        <field name="site_id" type="站点"></field>
-        <field name="mate_id" text="代号"></field>
+        <field name="site_id" text="站点"></field>
+        <field name="mate_id" text="代号">
+            <param name="deforce">create</param>
+            <param name="default">@cid</param>
+        </field>
+        <field name="type" type="enum">
+            <param name="type">int</param>
+            <param name="enum">mate_type</param>
+            <param name="default">0</param>
+        </field>
         <field name="name" text="名称"></field>
         <field name="note" text="备注"></field>
         <field name="icon" text="图标" rule="Thumb">
@@ -49,7 +60,7 @@
             <param name="path">static/upload/masque/mate</param>
             <param name="thumb-extn">png</param>
             <param name="thumb-mode">pick</param>
-            <param name="thumb-size">_lg:256*256,_md:128*128,_sm:64*64</param>
+            <param name="thumb-size">300*300</param>
             <param name="down-remote">yes</param>
         </field>
     </form>
@@ -59,8 +70,8 @@
         <field name="mate_id" required="yes"></field>
         <field name="room_id" required="yes"></field>
         <field name="kind" type="enum">
-            <param name="default">text</param>
             <param name="enum">chat_kind</param>
+            <param name="default">text</param>
         </field>
         <field name="note" type="text" rule="MasqueChatText">
             <param name="maxlength">200</param>
@@ -74,6 +85,11 @@
             <param name="deforce">always</param>
         </field>
     </form>
+    <enum name="mate_type">
+        <value code="0">用户</value>
+        <value code="1">客服</value>
+        <value code="2">智能客服</value>
+    </enum>
     <enum name="chat_kind">
         <value code="text">文本</value>
         <value code="link">链接</value>

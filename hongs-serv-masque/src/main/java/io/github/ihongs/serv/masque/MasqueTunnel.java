@@ -25,6 +25,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
@@ -36,7 +37,7 @@ import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 public final class MasqueTunnel {
 
     /**
-     * 后去接收管道对象
+     * 获取接收管道对象
      * @return
      */
     public static Async<Map> getCeiver() {
@@ -303,26 +304,22 @@ public final class MasqueTunnel {
                 }
             }  else {
                 try (
-                    CloseableHttpClient client = HttpClientBuilder.create().build()
+                    CloseableHttpClient cli = HttpClientBuilder.create().build()
                 ) {
-                    ClassicHttpRequest request = ClassicRequestBuilder
-                        .post(new URI(info.url))
-                        .setEntity(new StringEntity(info.msg, ContentType.APPLICATION_JSON))
-                        .build();
-                    client.execute(request, (resp) -> {
+                    URI         uri = new URI(info.url);
+                    HttpEntity  ent = new StringEntity(info.msg, ContentType.APPLICATION_JSON);
+                    ClassicHttpRequest req = ClassicRequestBuilder.post(uri).setEntity(ent).build( );
+                    cli.execute(req , (rsp) -> {
                         // 调试输出
                         if (4 == (4 & Core.DEBUG)) {
-                            int    code = resp.getCode();
-                            String text = Syno.indent(EntityUtils.toString(resp.getEntity(),"UTF-8").trim());
+                            int    code = rsp.getCode();
+                            String text = Syno.indent(EntityUtils.toString(rsp.getEntity(), "UTF-8").trim());
                             CoreLogger.debug("Masque remote notify, URL: {}, MSG: {}, RSP({}): {}", info.url, info.msg, code, text);
                         }
                         return null;
                     });
                 }
-                catch (URISyntaxException ex) {
-                    throw new CruxException(ex);
-                }
-                catch (IOException ex) {
+                catch (URISyntaxException | IOException ex) {
                     throw new CruxException(ex);
                 }
             }
