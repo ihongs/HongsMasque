@@ -21,11 +21,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.websocket.Session;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 
 /**
  * 管道集合
@@ -36,7 +38,6 @@ public final class MasqueTunnel {
     /**
      * 后去接收管道对象
      * @return
-     * @throws CruxException
      */
     public static Async<Map> getCeiver() {
         String name = Ceiver.class.getName();
@@ -301,25 +302,22 @@ public final class MasqueTunnel {
                     throw new CruxException(ex);
                 }
             }  else {
-                try {
-                    StringEntity enti = new StringEntity(info.msg, "UTF-8");
-                    enti.setContentType("application/json");
-                    enti.setContentEncoding("UTF-8");
-
-                    HttpPost http = new HttpPost();
-                    http.setURI(new URI(info.url));
-                    http.setEntity(enti);
-
-                    HttpResponse resp = HttpClients
-                        .createDefault()
-                        .execute( http );
-
-                    // 调试输出
-                    if (4 == (4 & Core.DEBUG)) {
-                        int    code = resp.getStatusLine().getStatusCode();
-                        String text = Syno.indent(EntityUtils.toString(resp.getEntity(),"UTF-8").trim());
-                        CoreLogger.debug("Masque remote notify, URL: {}, MSG: {}, RSP({}): {}", info.url, info.msg, code, text);
-                    }
+                try (
+                    CloseableHttpClient client = HttpClientBuilder.create().build()
+                ) {
+                    ClassicHttpRequest request = ClassicRequestBuilder
+                        .post(new URI(info.url))
+                        .setEntity(new StringEntity(info.msg, ContentType.APPLICATION_JSON))
+                        .build();
+                    client.execute(request, (resp) -> {
+                        // 调试输出
+                        if (4 == (4 & Core.DEBUG)) {
+                            int    code = resp.getCode();
+                            String text = Syno.indent(EntityUtils.toString(resp.getEntity(),"UTF-8").trim());
+                            CoreLogger.debug("Masque remote notify, URL: {}, MSG: {}, RSP({}): {}", info.url, info.msg, code, text);
+                        }
+                        return null;
+                    });
                 }
                 catch (URISyntaxException ex) {
                     throw new CruxException(ex);
