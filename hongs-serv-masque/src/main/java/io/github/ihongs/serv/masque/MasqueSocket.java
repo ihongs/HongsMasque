@@ -72,7 +72,7 @@ public class MasqueSocket {
     @OnMessage
     public void onMessage(Session sess, String msg) {
         try (
-            SocketHelper hepr = SocketHelper.getInstance(sess, "error");
+            SocketHelper hepr = SocketHelper.getInstance(sess, "message");
         ) {
             hepr.fault( "Unsupported!" );
             CoreLogger.debug (msg);
