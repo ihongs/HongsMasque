@@ -65,7 +65,10 @@
         </field>
     </form>
     <form name="chat">
-        <field name="id" type="string"></field>
+        <field name="id" type="string">
+            <param name="deforce">aerate</param>
+            <param name="default">@id</param>
+        </field>
         <field name="site_id" required="yes"></field>
         <field name="mate_id" required="yes"></field>
         <field name="room_id" required="yes"></field>

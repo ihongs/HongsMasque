@@ -172,7 +172,8 @@ public final class MasqueTunnel {
 
     }
 
-    private static class ChatSet {
+    private static class ChatSet
+    implements AutoCloseable {
 
         private final DB db;
         private final Table ctb;
@@ -220,6 +221,11 @@ public final class MasqueTunnel {
             }
         }
 
+        @Override
+        public void close() {
+            db.close();
+        }
+
     }
 
     private static void send(Map info) throws CruxException {
@@ -227,10 +233,14 @@ public final class MasqueTunnel {
         String roomId = (String) info.get("room_id");
         String mateId = (String) info.get("mate_id");
 
-        ChatSet     chat = new ChatSet();
+        try (
+            ChatSet chat = new ChatSet();
+        ) {
+
         Set<String> mids = new HashSet();
         Consumer<Msg> sndr = getSender();
         Map<String, Set<Session> > sess ;
+        String msg;
 
         // 保存消息
         chat.store(info);
@@ -238,7 +248,6 @@ public final class MasqueTunnel {
         // 排除来源
         mids.add(mateId);
 
-        String msg;
         msg = "{\"ok\":true,\"ern\":\"\",\"err\":\"\",\"msg\":\"\""
             + ",\"info\":"
             + Dist.toString(info)
@@ -308,6 +317,8 @@ public final class MasqueTunnel {
                     sndr.accept(new MasqueTunnel.Msg(msg, ur));
                 }
         }
+
+        } // End ChatSet
     }
 
     private static void send(Msg info) throws CruxException {

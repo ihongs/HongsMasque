@@ -107,7 +107,10 @@ public class MasqueAction {
          */
         MasqueTunnel.accept(info);
 
-        helper.reply("");
+        helper.reply(Synt.mapOf (
+            "id" , info.get("id"),
+            "ok" , true
+        ));
     }
 
     @Action("stat/search")
