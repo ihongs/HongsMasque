@@ -82,19 +82,9 @@ public final class MasqueTunnel {
     }
 
     /**
-     * 发送消息方法
-     * @param <T>
-     */
-    public static interface Add<T> {
-
-        public void add(T msg);
-
-    }
-
-    /**
      * 发送消息结构体
      */
-    public static class Msg {
+    private static class Msg {
 
         final  String  msg ;
         final  String  url ;
@@ -120,7 +110,7 @@ public final class MasqueTunnel {
     /**
      * 接收管道
      */
-    public static class Ceiver
+    private static class Ceiver
     extends Async<Map>
     implements Consumer<Map>, Core.Singleton {
 
@@ -151,7 +141,7 @@ public final class MasqueTunnel {
     /**
      * 发送管道
      */
-    public static class Sender
+    private static class Sender
     extends Async<Msg>
     implements Consumer<Msg>, Core.Singleton {
 
