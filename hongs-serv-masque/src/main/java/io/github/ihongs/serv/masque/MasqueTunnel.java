@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.websocket.Session;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -32,42 +33,62 @@ import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 
 /**
  * 管道集合
+ * <pre>
+ * masque.properties 配置项:
+ * core.masque.ceiver.max.tasks 接收管道容量
+ * core.masque.ceiver.max.servs 接收管道线程数
+ * core.masque.sender.max.tasks 发送管道容量
+ * core.masque.sender.max.servs 发送管道线程数
+ * core.masque.tunnel.builder   通道构造工厂类, 实现 Supplier&lt;Consumer&lt;Map&gt;&gt; 接口
+ * 容量和线程数仅对默认的接收器和发送器有效.
+ * 通过指定通道构造工厂类可扩展消息处理方法.
+ * </pre>
  * @author hong
  */
 public final class MasqueTunnel {
+
+    public static void accept(Map info) {
+        getCeiver().accept(info);
+    }
 
     /**
      * 获取接收管道对象
      * @return
      */
-    public static Async<Map> getCeiver() {
-        String name = Ceiver.class.getName();
-        Ceiver inst = (Ceiver) Core.GLOBAL_CORE.get(name);
-        if (inst == null) {
-            CoreConfig conf = CoreConfig.getInstance("masque");
-            inst =  new Ceiver( name,
-                    conf.getProperty("core.masque.ceiver.max.tasks", Integer.MAX_VALUE),
-                    conf.getProperty("core.masque.ceiver.max.servs", 1));
-            Core.GLOBAL_CORE.set(name, inst);
-        }
-        return inst;
+    private static Consumer<Map> getCeiver() {
+        return Core.getInterior().got(Ceiver.class.getName(), () -> {
+            CoreConfig cc = CoreConfig.getInstance("masque");
+            String c = cc.getProperty("core.masque.tunnel.build.class");
+            if (c != null && c.isEmpty()) {
+                return ((Supplier<Consumer<Map>>) Core.newInstance(c) ).get();
+            }
+            return new Ceiver ( Ceiver.class.getName(),
+                cc.getProperty("core.masque.ceiver.max.tasks", Integer.MAX_VALUE),
+                cc.getProperty("core.masque.ceiver.max.servs", 1) );
+        });
     }
 
     /**
      * 获取发送管道对象
      * @return
      */
-    public static Async<Msg> getSender() {
-        String name = Sender.class.getName();
-        Sender inst = (Sender) Core.GLOBAL_CORE.get(name);
-        if (inst == null) {
-            CoreConfig conf = CoreConfig.getInstance("masque");
-            inst =  new Sender( name,
-                    conf.getProperty("core.masque.sender.max.tasks", Integer.MAX_VALUE),
-                    conf.getProperty("core.masque.sender.max.servs", 2));
-            Core.GLOBAL_CORE.set(name, inst);
-        }
-        return inst;
+    private static Consumer<Msg> getSender() {
+        return Core.getInterior().got(Sender.class.getName(), () -> {
+            CoreConfig cc = CoreConfig.getInstance("masque");
+            return new Sender ( Ceiver.class.getName(),
+                cc.getProperty("core.masque.ceiver.max.tasks", Integer.MAX_VALUE),
+                cc.getProperty("core.masque.ceiver.max.servs", 1) );
+        });
+    }
+
+    /**
+     * 发送消息方法
+     * @param <T>
+     */
+    public static interface Add<T> {
+
+        public void add(T msg);
+
     }
 
     /**
@@ -99,12 +120,17 @@ public final class MasqueTunnel {
     /**
      * 接收管道
      */
-    private static class Ceiver
+    public static class Ceiver
     extends Async<Map>
-    implements Core.Singleton {
+    implements Consumer<Map>, Core.Singleton {
 
         private Ceiver(String name, int maxTasks, int maxServs) {
             super(name, maxTasks, maxServs);
+        }
+
+        @Override
+        public void accept(Map info) {
+            this.add(info);
         }
 
         @Override
@@ -125,12 +151,17 @@ public final class MasqueTunnel {
     /**
      * 发送管道
      */
-    private static class Sender
+    public static class Sender
     extends Async<Msg>
-    implements Core.Singleton {
+    implements Consumer<Msg>, Core.Singleton {
 
         private Sender(String name, int maxTasks, int maxServs) {
             super(name, maxTasks, maxServs);
+        }
+
+        @Override
+        public void accept(Msg info) {
+            this.add(info);
         }
 
         @Override
@@ -205,7 +236,7 @@ public final class MasqueTunnel {
 
         ChatSet     chat = new ChatSet();
         Set<String> mids = new HashSet();
-        Async <Msg> sndr = getSender(  );
+        Consumer<Msg> sndr = getSender();
         Map<String, Set<Session> > sess ;
 
         // 保存消息
@@ -227,7 +258,7 @@ public final class MasqueTunnel {
                 mids.add(et.getKey());
                 Set<Session> ss = et.getValue();
                 for(Session  se : ss) {
-                    sndr.add(new MasqueTunnel.Msg(msg, se));
+                    sndr.accept(new MasqueTunnel.Msg(msg, se));
                 }
             }
         }
@@ -240,7 +271,7 @@ public final class MasqueTunnel {
                 Set<Session> ss = sess.get(mid);
             if (  ss != null ) {
                 for(Session  se : ss) {
-                    sndr.add(new MasqueTunnel.Msg(msg, se));
+                    sndr.accept(new MasqueTunnel.Msg(msg, se));
                 }
                 mids.remove(mid);
             }}
@@ -272,7 +303,7 @@ public final class MasqueTunnel {
 //              mids.add(et.getKey());
                 Set<Session> ss = et.getValue();
                 for(Session  se : ss) {
-                    sndr.add(new MasqueTunnel.Msg(msg, se));
+                    sndr.accept(new MasqueTunnel.Msg(msg, se));
                 }
             }
         }
@@ -281,7 +312,7 @@ public final class MasqueTunnel {
         else {
                 String ur  = getNoteUrl(siteId);
                 if (   ur != null   ) {
-                    sndr.add(new MasqueTunnel.Msg(msg, ur));
+                    sndr.accept(new MasqueTunnel.Msg(msg, ur));
                 }
         }
     }

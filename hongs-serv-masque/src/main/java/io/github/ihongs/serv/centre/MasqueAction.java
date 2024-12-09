@@ -105,7 +105,7 @@ public class MasqueAction {
         /**
          * 推入管道
          */
-        MasqueTunnel.getCeiver().add(info);
+        MasqueTunnel.accept(info);
 
         helper.reply("");
     }
@@ -134,7 +134,7 @@ public class MasqueAction {
 
             Set ob  = Synt.toTerms(req.get(Cnst.OB_KEY));
             if (ob == null || ob.isEmpty()) {
-                ob  = Synt.setOf("-mtime");
+                ob  = Synt.setOf("mtime!");
                 req.put( Cnst.OB_KEY, ob );
             }
 
