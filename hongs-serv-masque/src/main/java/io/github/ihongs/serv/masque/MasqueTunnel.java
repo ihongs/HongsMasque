@@ -58,10 +58,13 @@ public final class MasqueTunnel {
     private static Consumer<Map> getCeiver() {
         return Core.getInterior().got(Ceiver.class.getName(), () -> {
             CoreConfig cc = CoreConfig.getInstance("masque");
-            String c = cc.getProperty("core.masque.tunnel.build.class");
+
+            // 外部指定
+            String c = cc.getProperty("core.masque.tunnel.builder");
             if (c != null && c.isEmpty()) {
-                return ((Supplier<Consumer<Map>>) Core.newInstance(c) ).get();
+                return ((Supplier<Consumer<Map>>) Core.newInstance(c)).get();
             }
+
             return new Ceiver ( Ceiver.class.getName(),
                 cc.getProperty("core.masque.ceiver.max.tasks", Integer.MAX_VALUE),
                 cc.getProperty("core.masque.ceiver.max.servs", 1) );
