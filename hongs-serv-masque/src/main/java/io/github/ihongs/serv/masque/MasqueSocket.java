@@ -45,7 +45,7 @@ public class MasqueSocket {
             try {
                 new VerifyHelper ( )
                     .addRulesByForm("masque","auth")
-                    . verify( hepr.getRequestData( ), false, true);
+                    .verify ( hepr.getRequestData( ), false, true);
             } catch (CruxException ex ) {
                 CoreLogger.error ( ex );
                 hepr.fault(ex.getLocalizedMessage());
