@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import javax.websocket.Session;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -39,32 +38,18 @@ import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
  * core.masque.ceiver.max.servs 接收管道线程数
  * core.masque.sender.max.tasks 发送管道容量
  * core.masque.sender.max.servs 发送管道线程数
- * core.masque.tunnel.builder   通道构造工厂类, 实现 Supplier&lt;Consumer&lt;Map&gt;&gt; 接口
- * 容量和线程数仅对默认的接收器和发送器有效.
- * 通过指定通道构造工厂类可扩展消息处理方法.
  * </pre>
  * @author hong
  */
 public final class MasqueTunnel {
 
-    public static void accept(Map info) {
-        getCeiver().accept(info);
-    }
-
     /**
      * 获取接收管道对象
      * @return
      */
-    private static Consumer<Map> getCeiver() {
+    public static Consumer<Map> getCeiver() {
         return Core.getInterior().got(Ceiver.class.getName(), () -> {
             CoreConfig cc = CoreConfig.getInstance("masque");
-
-            // 外部指定
-            String c = cc.getProperty("core.masque.tunnel.builder");
-            if (c != null && c.isEmpty()) {
-                return ((Supplier<Consumer<Map>>) Core.newInstance(c)).get();
-            }
-
             return new Ceiver ( Ceiver.class.getName(),
                 cc.getProperty("core.masque.ceiver.max.tasks", Integer.MAX_VALUE),
                 cc.getProperty("core.masque.ceiver.max.servs", 1) );
@@ -75,39 +60,13 @@ public final class MasqueTunnel {
      * 获取发送管道对象
      * @return
      */
-    private static Consumer<Msg> getSender() {
+    public static Consumer<Msg> getSender() {
         return Core.getInterior().got(Sender.class.getName(), () -> {
             CoreConfig cc = CoreConfig.getInstance("masque");
             return new Sender ( Ceiver.class.getName(),
                 cc.getProperty("core.masque.ceiver.max.tasks", Integer.MAX_VALUE),
                 cc.getProperty("core.masque.ceiver.max.servs", 1) );
         });
-    }
-
-    /**
-     * 发送消息结构体
-     */
-    private static class Msg {
-
-        final  String  msg ;
-        final  String  url ;
-        final  Session ses ;
-
-        public Msg(String msg, String  url) {
-            if ("".equals(url)) {
-                 url = null;
-            }
-            this.msg = msg ;
-            this.url = url ;
-            this.ses = null;
-        }
-
-        public Msg(String msg, Session ses) {
-            this.msg = msg ;
-            this.ses = ses ;
-            this.url = null;
-        }
-
     }
 
     /**
@@ -168,6 +127,32 @@ public final class MasqueTunnel {
             finally {
                 Core.getInstance( ).reset( );
             }
+        }
+
+    }
+
+    /**
+     * 发送消息结构体
+     */
+    private static class Msg {
+
+        final  String  msg ;
+        final  String  url ;
+        final  Session ses ;
+
+        public Msg(String msg, String  url) {
+            if ("".equals(url)) {
+                 url = null;
+            }
+            this.msg = msg ;
+            this.url = url ;
+            this.ses = null;
+        }
+
+        public Msg(String msg, Session ses) {
+            this.msg = msg ;
+            this.ses = ses ;
+            this.url = null;
         }
 
     }

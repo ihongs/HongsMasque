@@ -16,7 +16,7 @@ import io.github.ihongs.db.Table;
 import io.github.ihongs.db.util.FetchCase;
 import io.github.ihongs.db.util.FetchMore;
 import io.github.ihongs.dh.Roster;
-import io.github.ihongs.serv.masque.MasqueTunnel;
+import io.github.ihongs.serv.masque.Masque;
 import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.Digest;
 import io.github.ihongs.util.Remote;
@@ -105,7 +105,7 @@ public class MasqueAction {
         /**
          * 推入管道
          */
-        MasqueTunnel.accept(info);
+        Masque.getTunnel( ).accept( info );
 
         helper.reply(Synt.mapOf (
             "id" , info.get("id"),
