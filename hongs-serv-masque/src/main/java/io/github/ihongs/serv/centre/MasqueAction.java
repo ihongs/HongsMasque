@@ -470,13 +470,31 @@ public class MasqueAction {
             return;
         }
 
-        // 生成临时 token 一天有效
+        // 生成临时 token 超时失效
         String sec = Digest.md5(tok+"."+Core.newIdentity());
-        Roster.put( "masque.token."+sec, tok, (3600 * 24) );
+        Roster.put( "masque.token."+sec, tok, 3600);
 
         helper.reply(Synt.mapOf(
             "token", sec
         ));
+    }
+
+    @Action("token/update")
+    public void updateToken(ActionHelper helper) throws CruxException {
+        Map    req = helper.getRequestData( );
+        String tok = (String)req.get("token");
+
+        // 仅为临时 token 才能访问
+        if (Synt.declare(req.get("token_level"), 0) != 2) {
+            helper.fault(CoreLocale.getInstance("masque")
+                  .translate( "core.masque.wrong.level" ) );
+            return;
+        }
+
+        // 延时当前 token
+        Roster.put( "masque.token."+tok, 3600 );
+
+        helper.reply("");
     }
 
     @Action("token/delete")
