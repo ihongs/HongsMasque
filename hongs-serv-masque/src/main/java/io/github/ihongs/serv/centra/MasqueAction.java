@@ -214,9 +214,9 @@ public class MasqueAction {
         }
         tok = Digest.md5(sid+"/"+mid+"/"+rid+"/"+tok);
 
-        // 生成临时 token 一天有效
+        // 生成临时 token 超时失效
         String sec = Digest.md5(tok+"."+Core.newIdentity());
-        Roster.put( "masque.token."+sec, tok, (3600 * 24) );
+        Roster.put( "masque.token."+sec, tok, 3960);
 
         helper.reply(Synt.mapOf(
             "token", sec
