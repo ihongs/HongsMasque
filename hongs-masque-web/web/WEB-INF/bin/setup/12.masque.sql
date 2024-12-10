@@ -57,7 +57,6 @@ CREATE TABLE `a_masque_mate` (
   `id` CHAR(16) NOT NULL,
   `site_id` CHAR(16) NOT NULL,
   `mate_id` CHAR(36) NOT NULL,
-  `type`  TINYINT DEFAULT '0',
   `name` VARCHAR(200) DEFAULT NULL,
   `note` VARCHAR(500) DEFAULT NULL,
   `icon` VARCHAR(100) DEFAULT NULL,
