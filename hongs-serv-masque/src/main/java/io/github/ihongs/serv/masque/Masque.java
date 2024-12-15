@@ -15,6 +15,16 @@ import java.util.function.Supplier;
 public class Masque {
 
     /**
+     * 全局通知通道
+     */
+    public static String ROOM_ALL = "!all";
+
+    /**
+     * 离线通知通道
+     */
+    public static String ROOM_OFF = "!off";
+
+    /**
      * 获取通道
      * @return
      */
@@ -40,6 +50,23 @@ public class Masque {
          */
         public void accept(Map msg);
 
+        /**
+         * 移除会话
+         * @param sid Site ID
+         * @param mid Mate ID
+         * @param rid Room ID
+         */
+        public void remove(String sid, String mid, String rid);
+
+        /**
+         * 消息接口
+         * @param sid Site ID
+         * @param mid Mate ID
+         * @param rid Room ID
+         * @return
+         */
+        public String socket(String sid, String mid, String rid);
+
     }
 
     private static class SimpleTunnel implements Tunnel {
@@ -47,6 +74,17 @@ public class Masque {
         @Override
         public void accept(Map msg) {
             MasqueTunnel.getCeiver().accept(msg);
+        }
+
+        @Override
+        public void remove(String sid, String mid, String rid) {
+            MasqueSocket.delSessions(sid, rid, mid);
+        }
+
+        @Override
+        public String socket(String sid, String mid, String rid) {
+            return Core.SERVER_HREF.get()+Core.SERVER_PATH.get()
+                 + "/centre/masque/socket/"+sid+"/"+mid+"/"+rid;
         }
 
     }

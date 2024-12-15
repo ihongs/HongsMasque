@@ -7,7 +7,6 @@ import io.github.ihongs.CruxException;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Table;
 import io.github.ihongs.db.link.Loop;
-import io.github.ihongs.util.Dict;
 import io.github.ihongs.util.Dist;
 import io.github.ihongs.util.Syno;
 import io.github.ihongs.util.daemon.Async;
@@ -17,6 +16,7 @@ import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -157,53 +157,103 @@ public final class MasqueTunnel {
 
     }
 
-    private static class ChatSet
+    private static class Mst
     implements AutoCloseable {
 
         private final DB db;
         private final Table ctb;
         private final Table stb;
         private final long  now;
-        private final PreparedStatement upd;
-        private final PreparedStatement ins;
+        private final PreparedStatement unreadUpdate;
+        private final PreparedStatement unreadInsert;
+        private final PreparedStatement unsendUpdate;
+        private final PreparedStatement unsendInsert;
         private String sid = null;
         private String rid = null;
 
-        public ChatSet() throws CruxException {
+        public Mst() throws CruxException {
             now = System.currentTimeMillis();
             db  = DB.getInstance( "masque" );
                   db.open();
             ctb = db.getTable("chat");
-            stb = db.getTable("stat");
-            upd = db.prepare("UPDATE `"+stb.tableName+"` SET `fresh`=`fresh`+1,`mtime`=? WHERE `site_id`=? AND `room_id`=? AND `mate_id`=?");
-            ins = db.prepare("INSERT INTO `"+stb.tableName+"` (`fresh`,`mtime`,`site_id`,`room_id`,`mate_id`,`id`) VALUES (1, ?,?, ?,?, ?)");
+            stb = db.getTable("clue");
+            unreadInsert = db.prepare("INSERT INTO `"+stb.tableName+"` (`unread`,`mtime`,`site_id`,`room_id`,`mate_id`,`id`) VALUES (1, ?,?, ?,?, ?)");
+            unreadUpdate = db.prepare("UPDATE `"+stb.tableName+"` SET `unread`=`fresh`+1,`mtime`=? WHERE `site_id`=? AND `room_id`=? AND `mate_id`=?");
+            unsendInsert = db.prepare("INSERT INTO `"+stb.tableName+"` (`unsend`,`mtime`,`site_id`,`room_id`,`mate_id`,`id`) VALUES (1, ?,?, ?,?, ?)");
+            unsendUpdate = db.prepare("UPDATE `"+stb.tableName+"` SET `unsend`=`fresh`+1,`mtime`=? WHERE `site_id`=? AND `room_id`=? AND `mate_id`=?");
         }
 
-        public void store( Map info ) throws CruxException {
+        public void insert( Map info ) throws CruxException {
             ctb.insert(info);
 
             sid = (String) info.get("site_id");
             rid = (String) info.get("room_id");
         }
 
-        public void fresh(String mid) throws CruxException {
+        public void unread(String mid) throws CruxException {
             try {
-                    upd.setObject(1, now);
-                    upd.setObject(2, sid);
-                    upd.setObject(3, rid);
-                    upd.setObject(4, mid);
-                if (upd.executeUpdate(  ) == 0) {
-                    ins.setObject(1, now);
-                    ins.setObject(2, sid);
-                    ins.setObject(3, rid);
-                    ins.setObject(4, mid);
-                    ins.setObject(5, Core.newIdentity());
-                    ins.executeUpdate(  );
+                    unreadUpdate.setObject(1, now);
+                    unreadUpdate.setObject(2, sid);
+                    unreadUpdate.setObject(3, rid);
+                    unreadUpdate.setObject(4, mid);
+                if (unreadUpdate.executeUpdate(  ) == 0) {
+                    unreadInsert.setObject(1, now);
+                    unreadInsert.setObject(2, sid);
+                    unreadInsert.setObject(3, rid);
+                    unreadInsert.setObject(4, mid);
+                    unreadInsert.setObject(5, Core.newIdentity());
+                    unreadInsert.executeUpdate(  );
                 }
             }
             catch (SQLException ex) {
                 throw new CruxException(ex);
             }
+        }
+
+        public void unsend(String mid) throws CruxException {
+            try {
+                    unsendUpdate.setObject(1, now);
+                    unsendUpdate.setObject(2, sid);
+                    unsendUpdate.setObject(3, rid);
+                    unsendUpdate.setObject(4, mid);
+                if (unsendUpdate.executeUpdate(  ) == 0) {
+                    unsendInsert.setObject(1, now);
+                    unsendInsert.setObject(2, sid);
+                    unsendInsert.setObject(3, rid);
+                    unsendInsert.setObject(4, mid);
+                    unsendInsert.setObject(5, Core.newIdentity());
+                    unsendInsert.executeUpdate(  );
+                }
+            }
+            catch (SQLException ex) {
+                throw new CruxException(ex);
+            }
+        }
+
+        public String getNoteUrl(String siteId)
+        throws CruxException {
+            Loop rs = db.with  ("site"       )
+                        .select("note_url"   )
+                        .filter("id = ?" , siteId)
+                        .limit (1)
+                        .select( );
+            for(Map ro : rs) {
+                return (String) ro.get("note_url");
+            }
+            return null;
+        }
+
+        public Set<String> getMateIds(String siteId, String roomId)
+        throws CruxException {
+            Set  ms = new HashSet( );
+            Loop rs = db.with  ("clue"       )
+                        .select("mate_id"    )
+                        .filter("site_id = ? AND room_id = ?", siteId, roomId)
+                        .select( );
+            for(Map ro : rs) {
+                ms.add ( ro.get("mate_id") );
+            }
+            return  ms ;
         }
 
         @Override
@@ -214,61 +264,70 @@ public final class MasqueTunnel {
     }
 
     private static void send(Map info) throws CruxException {
+        Core core = Core.getInstance();
+        try {
+
         String siteId = (String) info.get("site_id");
         String roomId = (String) info.get("room_id");
         String mateId = (String) info.get("mate_id");
 
-        try (
-            ChatSet chat = new ChatSet();
-        ) {
-
-        Set<String> mids = new HashSet();
         Consumer<Msg> sndr = getSender();
-        Map<String, Set<Session> > sess ;
+        Map<String, Set<Session> > mess ;
+        Set<String>   mids ;
         String msg;
-
-        // 保存消息
-        chat.store(info);
-
-        // 排除来源
-        mids.add(mateId);
 
         msg = "{\"ok\":true,\"ern\":\"\",\"err\":\"\",\"msg\":\"\""
             + ",\"info\":"
             + Dist.toString(info)
             + "}" ;
 
+        // 保存消息
+        Mst  chat = new Mst(/**/);
+        chat.insert( info );
+
+        // 组内成员
+        mids = chat.getMateIds (siteId, roomId);
+        mids.remove(mateId);
+
         // 发送消息
-        sess = Dict.getValue(MasqueSocket.SESSIONS, Map.class, siteId, roomId);
-        if (sess != null) {
-            for(Map.Entry<String, Set<Session>> et : sess.entrySet()) {
-                mids.add(et.getKey());
+        mess = MasqueSocket.getSessions(siteId, roomId);
+        if (mess != null) {
+            for(Map.Entry<String, Set<Session>> et : mess.entrySet()) {
                 Set<Session> ss = et.getValue();
                 for(Session  se : ss) {
-                    sndr.accept(new MasqueTunnel.Msg(msg, se));
+                    sndr.accept( new MasqueTunnel.Msg(msg, se) );
                 }
+                mids.remove( et.getKey( ) );
             }
         }
 
         // 发送通知
-        sess = Dict.getValue(MasqueSocket.SESSIONS, Map.class, siteId, "!");
-        mids = getMateIds(siteId, roomId, mids);
-        for(String mid : mids) {
-            if (sess != null ) {
-                Set<Session> ss = sess.get(mid);
-            if (  ss != null ) {
-                for(Session  se : ss) {
-                    sndr.accept(new MasqueTunnel.Msg(msg, se));
+        mess = MasqueSocket.getSessions(siteId, Masque.ROOM_ALL);
+        Iterator <String> it;
+        it = mids.iterator();
+        while (it.hasNext()) {
+            String mid = it.next();
+            Set<Session> ss = mess.get(mid);
+            if (ss != null && !ss.isEmpty()) {
+                for(Session se : ss) {
+                    sndr.accept( new MasqueTunnel.Msg(msg, se) );
                 }
-                mids.remove(mid);
-            }}
-
-            // 未读数量
-            try {
-                chat.fresh (mid);
-            }
-            catch (CruxException ex) {
-                CoreLogger.error(ex);
+                it.remove();
+                // 未读计数
+                try {
+                    chat.unread(mid);
+                }
+                catch (CruxException ex) {
+                    CoreLogger.error(ex);
+                }
+            } else {
+                // 未发计数
+                try {
+                    chat.unsend(mid);
+                }
+                catch (CruxException ex) {
+                    CoreLogger.error(ex);
+                }
             }
         }
 
@@ -283,34 +342,33 @@ public final class MasqueTunnel {
             + Dist.toString(mids)
             + "}" ;
 
-        // 自定通知
-        sess = Dict.getValue(MasqueSocket.SESSIONS, Map.class, siteId, ".");
-        if (sess != null) {
-            for(Map.Entry<String, Set<Session>> et : sess.entrySet()) {
-//              mids.add(et.getKey());
+        // 离线通知
+        mess = MasqueSocket.getSessions(siteId, Masque.ROOM_OFF);
+        if (mess != null) {
+            for(Map.Entry<String, Set<Session>> et : mess.entrySet()) {
                 Set<Session> ss = et.getValue();
                 for(Session  se : ss) {
-                    sndr.accept(new MasqueTunnel.Msg(msg, se));
+                    sndr.accept( new MasqueTunnel.Msg(msg, se) );
                 }
+            }
+        } else {
+            // HTTP 推送
+            String ur = chat.getNoteUrl(siteId);
+            if (null != ur ) {
+                sndr.accept( new MasqueTunnel.Msg(msg, ur) );
             }
         }
 
-        // HTTP回调
-        else {
-                String ur  = getNoteUrl(siteId);
-                if (   ur != null   ) {
-                    sndr.accept(new MasqueTunnel.Msg(msg, ur));
-                }
+        } finally {
+            core.close();
         }
-
-        } // End ChatSet
     }
 
     private static void send(Msg info) throws CruxException {
         if (info.ses != null) {
             info.ses
-                .getAsyncRemote (  )
-                .sendText (info.msg);
+                .getAsyncRemote ( )
+                .sendText(info.msg);
         } else
         if (info.url != null) {
             if (info.url.startsWith("class://")) {
@@ -344,34 +402,6 @@ public final class MasqueTunnel {
                 }
             }
         }
-    }
-
-    private static     String  getNoteUrl(String siteId)
-    throws CruxException {
-        DB   db = DB.getInstance("masque");
-        Loop rs = db.with  ("site"       )
-                    .field ("note_url"   )
-                    .where ("id = ?" , siteId)
-                    .limit (1)
-                    .select( );
-        for(Map ro : rs) {
-            return (String) ro.get("note_url");
-        }
-        return null;
-    }
-
-    private static Set<String> getMateIds(String siteId, String roomId, Set<String> mateIds)
-    throws CruxException {
-        Set  ms = new HashSet();
-        DB   db = DB.getInstance("masque");
-        Loop rs = db.with  ("stat"       )
-                    .field ("mate_id"    )
-                    .where ("site_id=? AND room_id=? AND mate_id NOT IN (?)", siteId, roomId, mateIds)
-                    .select( );
-        for(Map ro : rs) {
-            ms.add ( ro.get("mate_id")   );
-        }
-        return  ms ;
     }
 
 }

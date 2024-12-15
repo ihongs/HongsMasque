@@ -8,20 +8,16 @@ xsi:schemaLocation="http://ihongs.github.io/hongs-core db.xsd">
                tableName="a_masque_site"
                primaryKey="id">
         </table>
-        <table name="chat"
-               tableName="a_masque_chat"
+        <table name="mate"
+               tableName="a_masque_mate"
                primaryKey="id">
         </table>
-        <table name="stat"
+        <table name="clue"
                tableName="a_masque_stat"
                primaryKey="id">
         </table>
-        <table name="room"
-               tableName="a_masque_room"
-               primaryKey="id">
-        </table>
-        <table name="mate"
-               tableName="a_masque_mate"
+        <table name="chat"
+               tableName="a_masque_chat"
                primaryKey="id">
         </table>
     </tables>
