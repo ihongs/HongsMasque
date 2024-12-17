@@ -49,17 +49,16 @@ public class MasqueAction {
             return;
         }
 
-        String sid = (String) req.get("site_id");
-        String rid = (String) req.get("room_id");
         String mid = (String) req.get("mate_id");
+        String rid = (String) req.get("meet_id");
 
         // 获取当前 socket
-        String sok = Masque.getTunnel().socket(sid, mid, rid);
+        String sok = Masque.getTunnel().socket(mid , rid);
 
         // 生成临时 token
-        String rec = Digest.md5 (sid+"/"+mid+"/"+rid+"/"+tok);
-        String sec = Digest.md5 (Core.newIdentity( )+"/"+tok);
-        Roster.put( "masque.token."+sec, rec, 3960 );
+        String sec = Digest.md5(Core.newIdentity()+"/"+tok);
+        String rec = Digest.md5( mid + "/" + rid + "/"+tok);
+        Roster.put( "masque.token."+sec, rec, 3960);
 
         // 注册状态
         Boolean cl = Synt.asBool(req.get("clue"));
@@ -67,9 +66,10 @@ public class MasqueAction {
             Table tab = DB.getInstance("masque").getTable("clue");
             if (cl) {
                 try {
+                    long now = System.currentTimeMillis();
                     tab.db.updates(
-                        "INSERT INTO `"+tab.tableName+"` (site_id, mate_id, room_id, mtime) VALUES (?, ?, ?, ?)",
-                        sid, mid, rid, System.currentTimeMillis()
+                        "INSERT INTO `"+tab.tableName+"` (`mate_id`, `meet_id`, `mtime`) VALUES (?, ?, ?)",
+                         mid, rid, now
                     );
                 } catch (CruxException e) {
                 if (e.getErrno() != 1045) {
@@ -78,8 +78,8 @@ public class MasqueAction {
             } else {
                 try {
                     tab.db.updates(
-                        "DELETE FROM `"+tab.tableName+"` WHERE site_id = ? AND mate_id = ? AND room_id = ?",
-                        sid, mid, rid
+                        "DELETE FROM `"+tab.tableName+"` WHERE `mate_id` = ? AND `meet_id` = ?",
+                         mid, rid
                     );
                 } catch (CruxException e) {
                     helper.fault(e.getLocalizedMessage());
@@ -109,19 +109,15 @@ public class MasqueAction {
             return;
         }
 
-        String sid = (String)req.get("site_id");
-        String rid = (String)req.get("room_id");
-        String mid = (String)req.get("mate_id");
+        String rid = (String) req.get("room_id");
+        String mid = (String) req.get("mate_id");
 
         // 移除会话
-        Masque.getTunnel( ).remove(sid,rid,mid);
+        Masque.getTunnel().remove(rid, mid);
 
         // 移除状态
-        Model  mod = DB.getInstance("masque").getModel("clue");
-        mod.table.delete(
-            "site_id = ? AND room_id = ? AND mate_id = ?",
-             sid, rid, mid
-        );
+        Table  tab = DB.getInstance("masque").getTable("clue");
+        tab.delete("`room_id` = ? AND `mate_id` = ?", rid,mid);
 
         helper.reply("");
     }
@@ -139,7 +135,7 @@ public class MasqueAction {
         }
 
         // 延时当前 token
-        Roster.put( "masque.token."+tok, 3960 );
+        Roster.put("masque.token."+tok, 3960);
 
         helper.reply("");
     }
@@ -162,7 +158,7 @@ public class MasqueAction {
         }
 
         // 移除当前 token
-        Roster.del( "masque.token."+tok );
+        Roster.del("masque.token."+tok);
 
         helper.reply("");
     }
@@ -183,20 +179,19 @@ public class MasqueAction {
             return;
         }
 
-        String sid = (String)req.get("site_id");
-        String rid = (String)req.get("room_id");
-        String mid = (String)req.get("mate_id");
-        Table  tab = DB.getInstance("masque").getTable("clue");
+        String mid = (String) req.get("mate_id");
+        String rid = (String) req.get("meet_id");
 
         /**
          * 1045 表示 SQL 错误,
          * 当触发唯一索引约束时就会抛出,
          * 此处用于区分记录是否已经存在.
          */
+        Table  tab = DB.getInstance("masque").getTable("clue");
+        long   now = System.currentTimeMillis( );
         try {
-            int n = tab.db.updates(
-                "INSERT INTO `"+tab.tableName+"` (site_id, mate_id, room_id, mtime) VALUES (?, ?, ?, ?)",
-                sid, mid, rid, System.currentTimeMillis()
+            int  n = tab.db.updates("INSERT INTO `"+tab.tableName+"` (`mate_id`, `meet_id`, `mtime`) VALUES (?, ?, ?)",
+                 mid, rid, now
             );
             helper.reply( "" , n);
         } catch (CruxException e) {
@@ -223,15 +218,14 @@ public class MasqueAction {
             return;
         }
 
-        String sid = (String)req.get("site_id");
-        String mid = (String)req.get("mate_id");
-        String rid = (String)req.get("room_id");
-        Table  tab = DB.getInstance("masque").getTable("clue");
+        String mid = (String) req.get("mate_id");
+        String rid = (String) req.get("meet_id");
 
+        Table  tab = DB.getInstance("masque").getTable("clue");
         try {
             int n = tab.db.updates(
-                "DELETE FROM `"+tab.tableName+"` WHERE site_id = ? AND mate_id = ? AND room_id = ?",
-                sid, mid, rid
+                "DELETE FROM `"+tab.tableName+"` WHERE `mate_id` = ? AND `meet_id` = ?",
+                mid, rid
             );
             helper.reply( "" , n);
         } catch (CruxException e) {
@@ -246,9 +240,8 @@ public class MasqueAction {
     )
     public void searchClue(ActionHelper helper) throws CruxException {
         Map    req = helper.getRequestData( );
-        String sid = (String) req.get("site_id");
         String mid = (String) req.get("mate_id");
-        String rid = (String) req.get("room_id");
+        String rid = (String) req.get("meet_id");
 
         Set rb  = Synt.toTerms(req.get(Cnst.RB_KEY));
         if (rb == null || rb.isEmpty()) {
@@ -261,15 +254,15 @@ public class MasqueAction {
         Map    row;
         Map    inf;
 
-        if (Masque.ROOM_ALL.equals(rid)
-        ||  Masque.ROOM_OFF.equals(rid)) {
+        if (Masque.ROOM_ALL.equals(rid)) {
             if (rb.contains("unread")
             ||  rb.contains("unsend")
             ||  rb.contains("mtime")) {
-                sql = "SELECT MAX(s.mtime) AS mtime, SUM(s.unread) AS unread, SUM(s.unsend) AS unsend"
-                    + " FROM `"+sta.tableName+"` AS s"
-                    + " WHERE s.site_id=? AND s.mate_id=?";
-                row = sta.db.fetchOne(sql, sid, mid);
+                sql = "SELECT MAX(mtime) AS mtime, SUM(unread) AS unread, SUM(unsend) AS unsend"
+                    + " FROM `"+sta.tableName+"`"
+                    + " WHERE mate_id = ?"
+                    + " GROUP BY mate_id";
+                row = sta.db.fetchOne(sql, mid);
                 inf = Synt.mapOf(
                     "mtime" , Synt.declare(row.get("mtime" ), 0L),
                     "unread", Synt.declare(row.get("unread"), 0 ),
@@ -281,22 +274,22 @@ public class MasqueAction {
 
             // 追加最新消息
             if (rb.contains("last_chat")) {
-                sql = "SELECT s.room_id,c.mate_id,c.ctime,c.kind,c.note"
-                    + " FROM `"+cha.tableName+"` AS c"
-                    + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
-                    + " WHERE c.site_id=? AND s.mate_id=?"
-                    + " ORDER BY c.ctime" ;
-                row = cha.db.fetchOne(sql, sid, mid);
+                sql = "SELECT *"
+                    + " FROM `"+cha.tableName+"`"
+                    + " WHERE mate_id = ?"
+                    + " ORDER BY ctime DESC";
+                row = cha.db.fetchOne(sql, mid);
                 inf.put("last_chat" , row);
             }
         } else {
             if (rb.contains("unread")
             ||  rb.contains("unsend")
             ||  rb.contains("mtime")) {
-                sql = "SELECT MAX(s.mtime) AS mtime, SUM(s.unread) AS unread, SUM(s.unsend) AS unsend"
-                    + " FROM `"+sta.tableName+"` AS s"
-                    + " WHERE s.site_id=? AND s.mate_id=? AND s.room_id=?";
-                row = sta.db.fetchOne(sql, sid, mid, rid);
+                sql = "SELECT mtime, unread, unsend"
+                    + " FROM `"+sta.tableName+"`"
+                    + " WHERE mate_id = ?"
+                    +   " AND meet_id = ?";
+                row = sta.db.fetchOne(sql, mid, rid);
                 inf = Synt.mapOf(
                     "mtime" , Synt.declare(row.get("mtime" ), 0L),
                     "unread", Synt.declare(row.get("unread"), 0 ),
@@ -308,12 +301,12 @@ public class MasqueAction {
 
             // 追加最新消息
             if (rb.contains("last_chat")) {
-                sql = "SELECT s.room_id,c.mate_id,c.ctime,c.kind,c.note"
-                    + " FROM `"+cha.tableName+"` AS c"
-                    + " INNER JOIN `"+sta.tableName+"` AS s ON s.site_id=c.site_id AND s.room_id=c.room_id"
-                    + " WHERE c.site_id=? AND s.mate_id=? AND c.room_id=?"
-                    + " ORDER BY c.ctime";
-                row = cha.db.fetchOne(sql, sid, mid, rid);
+                sql = "SELECT *"
+                    + " FROM `"+cha.tableName+"`"
+                    + " WHERE mate_id = ?"
+                    +   " AND meet_id = ?"
+                    + " ORDER BY ctime DESC";
+                row = cha.db.fetchOne(sql, mid, rid);
                 inf.put("last_chat" , row);
             }
         }
@@ -328,9 +321,8 @@ public class MasqueAction {
     )
     public void searchChat(ActionHelper helper) throws CruxException {
         Map    req = helper.getRequestData( );
-        String sid = (String) req.get("site_id");
         String mid = (String) req.get("mate_id");
-        String rid = (String) req.get("room_id");
+        String rid = (String) req.get("meet_id");
 
         // 不限用户
         req.remove("mate_id");
@@ -353,9 +345,9 @@ public class MasqueAction {
         Set ab  = Synt.toTerms(req.get(Cnst.AB_KEY));
         if (ab != null && ab.contains (  "clean"  )) {
             String sql = "UPDATE `"+tab.tableName+"` SET `unread`=0,`unsend`=0,`mtime`=?"
-                       + " WHERE (`unread`!=0 OR `unsend`!=0) AND `site_id`=? AND `mate_id`=? AND `room_id`=?";
+                       + " WHERE (`unread`!=0 OR `unsend`!=0) AND `mate_id`=? AND `room_id`=?";
             long   now = System.currentTimeMillis( );
-            tab.db.updates (sql, now, sid, mid, rid);
+            tab.db.updates (sql, now, mid, rid);
         }
     }
 
@@ -387,14 +379,13 @@ public class MasqueAction {
             helper.reply( wr.toReply(em) );
             return;
         }
+        
+        Model  mod = DB.getInstance("masque").getModel("chat");
+        String  id = mod.create(req);
+        helper.reply("", id);
 
         // 推入管道
         Masque.getTunnel( ).accept( info );
-
-        helper.reply(Synt.mapOf (
-            "id" , info.get("id"),
-            "ok" , true
-        ));
     }
 
 }

@@ -230,25 +230,12 @@ public final class MasqueTunnel {
             }
         }
 
-        public String getNoteUrl(String siteId)
-        throws CruxException {
-            Loop rs = db.with  ("site"       )
-                        .select("note_url"   )
-                        .filter("id = ?" , siteId)
-                        .limit (1)
-                        .select( );
-            for(Map ro : rs) {
-                return (String) ro.get("note_url");
-            }
-            return null;
-        }
-
-        public Set<String> getMateIds(String siteId, String roomId)
+        public Set<String> getMateIds(String meetId)
         throws CruxException {
             Set  ms = new HashSet( );
-            Loop rs = db.with  ("clue"       )
-                        .select("mate_id"    )
-                        .filter("site_id = ? AND room_id = ?", siteId, roomId)
+            Loop rs = db.with  ("clue"     )
+                        .select("mate_id"  )
+                        .filter("meet_id=?", meetId)
                         .select( );
             for(Map ro : rs) {
                 ms.add ( ro.get("mate_id") );
@@ -267,9 +254,8 @@ public final class MasqueTunnel {
         Core core = Core.getInstance();
         try {
 
-        String siteId = (String) info.get("site_id");
-        String roomId = (String) info.get("room_id");
         String mateId = (String) info.get("mate_id");
+        String meetId = (String) info.get("meet_id");
 
         Consumer<Msg> sndr = getSender();
         Map<String, Set<Session> > mess ;
@@ -286,23 +272,23 @@ public final class MasqueTunnel {
         chat.insert( info );
 
         // 组内成员
-        mids = chat.getMateIds (siteId, roomId);
+        mids = chat.getMateIds(meetId);
         mids.remove(mateId);
 
         // 发送消息
-        mess = MasqueSocket.getSessions(siteId, roomId);
+        mess = MasqueSocket.getSessions(meetId);
         if (mess != null) {
             for(Map.Entry<String, Set<Session>> et : mess.entrySet()) {
                 Set<Session> ss = et.getValue();
                 for(Session  se : ss) {
-                    sndr.accept( new MasqueTunnel.Msg(msg, se) );
+                    sndr.accept(new MasqueTunnel.Msg(msg, se));
                 }
                 mids.remove( et.getKey( ) );
             }
         }
 
         // 发送通知
-        mess = MasqueSocket.getSessions(siteId, Masque.ROOM_ALL);
+        mess = MasqueSocket.getSessions(Masque.ROOM_ALL);
         Iterator <String> it;
         it = mids.iterator();
         while (it.hasNext()) {
@@ -310,7 +296,7 @@ public final class MasqueTunnel {
             Set<Session> ss = mess.get(mid);
             if (ss != null && !ss.isEmpty()) {
                 for(Session se : ss) {
-                    sndr.accept( new MasqueTunnel.Msg(msg, se) );
+                    sndr.accept(new MasqueTunnel.Msg(msg, se));
                 }
                 it.remove();
                 // 未读计数
@@ -343,24 +329,14 @@ public final class MasqueTunnel {
             + "}" ;
 
         // 离线通知
-        mess = MasqueSocket.getSessions(siteId, Masque.ROOM_OFF);
-        if (mess != null) {
-            for(Map.Entry<String, Set<Session>> et : mess.entrySet()) {
-                Set<Session> ss = et.getValue();
-                for(Session  se : ss) {
-                    sndr.accept( new MasqueTunnel.Msg(msg, se) );
-                }
-            }
-        } else {
-            // HTTP 推送
-            String ur = chat.getNoteUrl(siteId);
-            if (null != ur ) {
-                sndr.accept( new MasqueTunnel.Msg(msg, ur) );
-            }
+        CoreConfig  cc = CoreConfig.getInstance ( "masque" );
+        String ur = cc.getProperty("core.masque.notice.api");
+        if (null != ur) {
+            sndr.accept ( new MasqueTunnel. Msg (msg, ur ) );
         }
 
         } finally {
-            core.close();
+            core.close( );
         }
     }
 

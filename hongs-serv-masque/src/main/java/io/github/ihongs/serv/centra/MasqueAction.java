@@ -1,15 +1,19 @@
 package io.github.ihongs.serv.centra;
 
+import io.github.ihongs.Cnst;
 import io.github.ihongs.Core;
 import io.github.ihongs.CruxException;
 import io.github.ihongs.action.ActionHelper;
+import io.github.ihongs.action.ActionRunner;
+import io.github.ihongs.action.NaviMap;
 import io.github.ihongs.action.anno.Action;
 import io.github.ihongs.action.anno.CommitSuccess;
-import io.github.ihongs.action.anno.Preset;
 import io.github.ihongs.action.anno.Select;
 import io.github.ihongs.action.anno.Verify;
 import io.github.ihongs.db.DB;
 import io.github.ihongs.db.Model;
+import io.github.ihongs.dh.IActing;
+import io.github.ihongs.util.Dict;
 import io.github.ihongs.util.Digest;
 import java.util.Map;
 import java.util.Random;
@@ -19,12 +23,23 @@ import java.util.Random;
  * @author hong
  */
 @Action("centra/masque")
-public class MasqueAction {
+public class MasqueAction implements IActing {
+
+    @Override
+    public void acting(ActionHelper helper, ActionRunner runner) throws CruxException {
+        // 没有全局管理权限则限定站点
+        if (! NaviMap.getInstance().chkAuth("centra/masque/manage/all")) {
+            if ("create".equals(runner.getHandle())) {
+                Dict.setValue(helper.getRequestData(), helper.getSessibute(Cnst.UID_SES), "user_id" );
+            } else {
+                Dict.setValue(helper.getRequestData(), helper.getSessibute(Cnst.UID_SES), Cnst.AR_KEY, "x", "user_id");
+            }
+        }
+    }
 
     //** 站点 **/
 
     @Action("site/search")
-    @Preset(conf="masque", form="site")
     @Select(conf="masque", form="site")
     public void searchSite(ActionHelper helper)
     throws CruxException {
@@ -35,7 +50,6 @@ public class MasqueAction {
     }
 
     @Action("site/recite")
-    @Preset(conf="masque", form="site")
     @Select(conf="masque", form="site")
     public void reciteSite(ActionHelper helper)
     throws CruxException {
@@ -46,7 +60,6 @@ public class MasqueAction {
     }
 
     @Action("site/create")
-    @Preset(conf="masque", form="site", defs={".defence"})
     @Verify(conf="masque", form="site")
     @CommitSuccess
     public void createSite(ActionHelper helper)
@@ -66,7 +79,6 @@ public class MasqueAction {
     }
 
     @Action("site/update")
-    @Preset(conf="masque", form="site", defs={".defence"})
     @Verify(conf="masque", form="site")
     @CommitSuccess
     public void updateSite(ActionHelper helper)
@@ -86,7 +98,6 @@ public class MasqueAction {
     }
 
     @Action("site/delete")
-    @Preset(conf="masque", form="site", defs={".defence"})
     @CommitSuccess
     public void deleteSite(ActionHelper helper)
     throws CruxException {
@@ -99,7 +110,6 @@ public class MasqueAction {
     //** 人员 **/
 
     @Action("mate/search")
-    @Preset(conf="masque", form="mate")
     @Select(conf="masque", form="mate")
     public void searchMate(ActionHelper helper)
     throws CruxException {
@@ -110,7 +120,6 @@ public class MasqueAction {
     }
 
     @Action("mate/recite")
-    @Preset(conf="masque", form="mate")
     @Select(conf="masque", form="mate")
     public void reciteMate(ActionHelper helper)
     throws CruxException {
@@ -121,7 +130,6 @@ public class MasqueAction {
     }
 
     @Action("mate/create")
-    @Preset(conf="masque", form="mate", defs={".defence"})
     @Verify(conf="masque", form="mate")
     @CommitSuccess
     public void createMate(ActionHelper helper)
@@ -133,7 +141,6 @@ public class MasqueAction {
     }
 
     @Action("mate/update")
-    @Preset(conf="masque", form="mate", defs={".defence"})
     @Verify(conf="masque", form="mate")
     @CommitSuccess
     public void updateMate(ActionHelper helper)
@@ -145,7 +152,6 @@ public class MasqueAction {
     }
 
     @Action("mate/delete")
-    @Preset(conf="masque", form="mate", defs={".defence"})
     @CommitSuccess
     public void deleteMate(ActionHelper helper)
     throws CruxException {

@@ -17,12 +17,7 @@ public class Masque {
     /**
      * 全局通知通道
      */
-    public static String ROOM_ALL = "!all";
-
-    /**
-     * 离线通知通道
-     */
-    public static String ROOM_OFF = "!off";
+    public static String ROOM_ALL = "0";
 
     /**
      * 获取通道
@@ -48,43 +43,42 @@ public class Masque {
          * 写入消息
          * @param msg chat 数据
          */
-        public void accept(Map msg);
+        public  void  accept (Map msg);
 
         /**
          * 移除会话
-         * @param sid Site ID
-         * @param mid Mate ID
-         * @param rid Room ID
+         * @param mateId
+         * @param meetId
          */
-        public void remove(String sid, String mid, String rid);
+        public  void  remove (String mateId, String meetId);
 
         /**
          * 消息接口
-         * @param sid Site ID
-         * @param mid Mate ID
-         * @param rid Room ID
+         * @param mateId Mate ID
+         * @param meetId Meet ID
          * @return
          */
-        public String socket(String sid, String mid, String rid);
+        public String socket (String mateId, String meetId);
 
     }
 
     private static class SimpleTunnel implements Tunnel {
 
         @Override
-        public void accept(Map msg) {
+        public  void  accept (Map msg) {
             MasqueTunnel.getCeiver().accept(msg);
         }
 
         @Override
-        public void remove(String sid, String mid, String rid) {
-            MasqueSocket.delSessions(sid, rid, mid);
+        public  void  remove (String mateId, String meetId) {
+            MasqueSocket.delSessions(meetId, mateId);
         }
 
         @Override
-        public String socket(String sid, String mid, String rid) {
-            return Core.SERVER_HREF.get()+Core.SERVER_PATH.get()
-                 + "/centre/masque/socket/"+sid+"/"+mid+"/"+rid;
+        public String socket (String mateId, String meetId) {
+            return Core.SERVER_HREF.get()
+                 + Core.SERVER_PATH.get()
+                 + "/centre/masque/socket/"+ mateId +"/"+ meetId;
         }
 
     }

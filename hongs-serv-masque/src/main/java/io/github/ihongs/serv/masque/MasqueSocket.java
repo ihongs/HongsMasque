@@ -23,16 +23,15 @@ import javax.websocket.server.ServerEndpoint;
  *
  * <pre>
  * 共有三种模式
- * 用户聊天 : /centre/masque/socket/{site_id}/{mate_id}/{room_id}
- * 全部聊天 : /centre/masque/socket/{site_id}/{mate_id}/$all
- * 离线通知 : /centre/masque/socket/{site_id}/0/$off
+ * 用户聊天: /centre/masque/socket/{mate_id}/{room_id}
+ * 全部聊天: /centre/masque/socket/{mate_id}/0
  * </pre>
  *
  * @author hong
  */
 @ServerEndpoint(
     configurator = SocketHelper.Config.class,
-    value = "/centre/masque/socket/{site_id}/{mate_id}/{room_id}"
+    value = "/centre/masque/socket/{mate_id}/{room_id}"
 )
 public class MasqueSocket {
 
@@ -113,31 +112,23 @@ public class MasqueSocket {
 
     //** 静态工具方法 **/
 
-    private static final Map<String, Map<String, Map<String, Set<Session>>>> SESSIONS = new HashMap(); // site_id:room_id:mate_id:[Session]
+    private static final Map<String, Map<String, Set<Session>>> SESSIONS = new HashMap(); // site_id:room_id:mate_id:[Session]
 
     private static void addSession(Session sess) {
-        String sid = (String) sess.getPathParameters().get("site_id");
-        String rid = (String) sess.getPathParameters().get("room_id");
+        String rid = (String) sess.getPathParameters().get("meet_id");
         String mid = (String) sess.getPathParameters().get("mate_id");
 
-        Map<String, Map<String, Set<Session>>> siteRoom;
         Map<String, Set<Session>> roomMate;
-        Set<Session> mateSess;
+                    Set<Session>  mateSess;
 
         Lock lock = Gate.getLeader(MasqueSocket.class.getName()+":SESSIONS").writeLock();
         lock.lock( );
         try {
 
-        siteRoom = SESSIONS.get(sid);
-        if (siteRoom == null) {
-            siteRoom = new HashMap();
-            SESSIONS.put(sid, siteRoom);
-        }
-
-        roomMate = siteRoom.get(rid);
+        roomMate = SESSIONS.get(rid);
         if (roomMate == null) {
             roomMate = new HashMap();
-            siteRoom.put(rid, roomMate);
+            SESSIONS.put(rid, roomMate);
         }
 
         mateSess = roomMate.get(mid);
@@ -155,24 +146,17 @@ public class MasqueSocket {
     }
 
     private static void delSession(Session sess) {
-        String sid = (String) sess.getPathParameters().get("site_id");
-        String rid = (String) sess.getPathParameters().get("room_id");
+        String rid = (String) sess.getPathParameters().get("meet_id");
         String mid = (String) sess.getPathParameters().get("mate_id");
 
-        Map<String, Map<String, Set<Session>>> siteRoom;
         Map<String, Set<Session>> roomMate;
-        Set<Session> mateSess;
+                    Set<Session>  mateSess;
 
         Lock lock = Gate.getLeader(MasqueSocket.class.getName()+":SESSIONS").writeLock();
         lock.lock( );
         try {
 
-        siteRoom = SESSIONS.get(sid);
-        if (siteRoom == null) {
-            return;
-        }
-
-        roomMate = siteRoom.get(rid);
+        roomMate = SESSIONS.get(rid);
         if (roomMate == null) {
             return;
         }
@@ -190,11 +174,7 @@ public class MasqueSocket {
         }
 
         if (roomMate.isEmpty()) {
-            siteRoom.remove(rid);
-        }
-
-        if (siteRoom.isEmpty()) {
-            SESSIONS.remove(sid);
+            SESSIONS.remove(rid);
         }
 
         } finally {
@@ -202,21 +182,15 @@ public class MasqueSocket {
         }
     }
 
-    public static void delSessions(String sid, String rid, String mid) {
-        Map<String, Map<String, Set<Session>>> siteRoom;
+    public static void delSessions(String rid, String mid) {
         Map<String, Set<Session>> roomMate;
-        Set<Session> mateSess;
+                    Set<Session>  mateSess;
 
         Lock lock = Gate.getLeader(MasqueSocket.class.getName()+":SESSIONS").writeLock();
         lock.lock( );
         try {
 
-        siteRoom = SESSIONS.get(sid);
-        if (siteRoom == null) {
-            return;
-        }
-
-        roomMate = siteRoom.get(rid);
+        roomMate = SESSIONS.get(rid);
         if (roomMate == null) {
             return;
         }
@@ -230,11 +204,7 @@ public class MasqueSocket {
         roomMate.remove(mid );
 
         if (roomMate.isEmpty()) {
-            siteRoom.remove(rid);
-        }
-
-        if (siteRoom.isEmpty()) {
-            SESSIONS.remove(sid);
+            SESSIONS.remove(rid);
         }
 
         } finally {
@@ -251,26 +221,20 @@ public class MasqueSocket {
         }
     }
 
-    public static Map<String, Set<Session>> getSessions(String sid, String rid) {
-        Map<String, Map<String, Set<Session>>> siteRoom;
+    public static Map<String, Set<Session>> getSessions(String rid) {
         Map<String, Set<Session>> roomMate;
 
         Lock lock = Gate.getLeader(MasqueSocket.class.getName()+":SESSIONS").readLock();
         lock.lock( );
         try {
 
-        siteRoom = SESSIONS.get(sid);
-        if (siteRoom == null) {
-            return null;
-        }
-
-        roomMate = siteRoom.get(rid);
+        roomMate = SESSIONS.get(rid);
         if (roomMate == null) {
             return null;
         }
 
         // 深度拷贝, 规避异常 ConcurrentModificationException
-        roomMate = new HashMap(roomMate);
+        roomMate = new HashMap (roomMate);
         for(Map.Entry<String, Set<Session>> et : roomMate.entrySet()) {
             et.setValue(new HashSet(et.getValue()));
         }
